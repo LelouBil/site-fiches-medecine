@@ -15,7 +15,7 @@ const ue = arborescence_cours.find(ue => ue.id === ue_id)!;
     <ul>
         {ue.themes.map(theme => (
                 <li>
-                    <a href={new URL(`${ue.id}/${theme.id}`,Astro.url).pathname}>{theme.name}</a>
+                    <a href={`${theme.id}`}>{theme.name}</a>
                 </li>
         ))}
     </ul>

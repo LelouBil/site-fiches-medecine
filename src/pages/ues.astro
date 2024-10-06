@@ -8,7 +8,7 @@ import {arborescence_cours} from "../lib/files";---
     <ul>
         {arborescence_cours.map(ue => (
             <li>
-                <a href={new URL(`ues/${ue.id}`,Astro.url).pathname}>{ue.name}</a>
+                <a href={`${ue.id}`}>{ue.name}</a>
             </li>
         ))}
     </ul>

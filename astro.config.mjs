@@ -5,6 +5,7 @@ import {defineConfig, envField} from 'astro/config';
 export default defineConfig({
     site: "https://leloubil.github.com",
     base: 'medecine_fiches',
+    trailingSlash: 'never',
     experimental: {
         env: {
             schema: {

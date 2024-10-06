@@ -19,7 +19,7 @@ const theme = ue.themes.find(theme => theme.id === theme_id)!;
     <ul>
         {theme.cours.map(cours => (
                 <li>
-                    <a href={new URL(`${theme.id}/${cours.id}`,Astro.url).pathname}>{cours.name}</a>
+                    <a href={`${cours.id}`}>{cours.name}</a>
                 </li>
         ))}
     </ul>
