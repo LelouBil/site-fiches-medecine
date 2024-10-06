@@ -53,6 +53,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
                                 }));
                             const questions_qcm = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
                                 ?.find(fiche => fiche.name == "questions.json");
+                            fiches.sort((a, b) => a.name.localeCompare(b.name));
                             cours.push({
                                 name: dossier_cours.name,
                                 id: dossier_cours.id,
@@ -61,6 +62,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
                             });
                         }
                     }
+                    cours.sort((a, b) => a.name.localeCompare(b.name));
                     themes.push({
                         name: dossier_theme.name,
                         id: dossier_theme.id,
@@ -68,12 +70,14 @@ async function get_arborescence_cours(): Promise<AllCours> {
                     });
                 }
             }
+            themes.sort((a, b) => a.name.localeCompare(b.name));
             ues.push({
                 name: dossier_ue.name,
                 id: dossier_ue.id,
                 themes: themes
             });
         }
+        ueFolders.sort((a, b) => a.name.localeCompare(b.name));
     }
     return ues;
 }
