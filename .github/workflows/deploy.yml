@@ -21,6 +21,11 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
       - name: Install, build, and upload your site
+        env:
+          DRIVE_OAUTH2_CLIENT_ID: ${{ secrets.DRIVE_OAUTH2_CLIENT_ID }}
+          DRIVE_OAUTH2_CLIENT_SECRET: ${{ secrets.DRIVE_OAUTH2_CLIENT_SECRET }}
+          DRIVE_OAUTH2_REFRESH_TOKEN: ${{ secrets.DRIVE_OAUTH2_REFRESH_TOKEN }}
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
         uses: withastro/action@v3
           # with:
           # path: . # The root location of your Astro project inside the repository. (optional)

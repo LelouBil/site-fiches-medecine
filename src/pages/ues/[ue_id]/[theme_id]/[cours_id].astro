@@ -22,7 +22,7 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
     <h1> Je suis le cours {cours.name} dans le theme {theme.name} de l'UE {ue.name}</h1>
     <h3>Fiches : </h3>
     {cours.fiches.map(fiche => (
-            <object data={fiche.embed_url} type="application/pdf" width="100%" height="50%">
+            <object data={fiche.embed_url} type="application/pdf" width="100%" height="100%">
             </object>
             <a href={fiche.download_url}>{fiche.name}</a>
     ))
