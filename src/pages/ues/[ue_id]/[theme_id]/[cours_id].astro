@@ -19,7 +19,7 @@ const theme = ue.themes.find(theme => theme.id === theme_id)!;
 const cours = theme.cours.find(cours => cours.id === cours_id)!;
 ---
 
-<Layout title=`${ue.name} > ${theme.name} > ${cours.name}`>
+<Layout title=`${cours.name}`>
     <MainHeader>{cours.name}</MainHeader>
     <hr class="mb-5 "/>
     <h3>Fiches </h3>
