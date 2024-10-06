@@ -1,0 +1,16 @@
+---
+import {arborescence_cours} from "@/lib/files";
+import ListPage from "@/layouts/ListPage.astro";
+import ListItem from "@/components/ListItem.astro";
+---
+
+<ListPage title="UEs">
+    <p slot="header">UEs</p>
+    <Fragment slot="elements">
+        {arborescence_cours.map(ue => (
+                <ListItem href={`${ue.id}`}>
+                    {ue.name}
+                </ListItem>
+        ))}
+    </Fragment>
+</ListPage>

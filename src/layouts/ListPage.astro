@@ -1,0 +1,27 @@
+---
+import Layout from "./Layout.astro";
+import MainHeader from "../components/MainHeader.astro";
+interface Props {
+    title: string;
+
+}
+
+const {title} = Astro.props;
+
+---
+
+<Layout title={title}>
+    <div class="container my-5">
+        <!-- Heading styled for the Lux theme -->
+        <MainHeader ><slot name="header"/></MainHeader>
+        <hr class="mb-5 "/>
+        <slot name="before-elements"/>
+        <!-- Vertically ordered list with darker background and enhanced shadow -->
+        <ul class="list-group list-group-flush">
+           <!--suppress HtmlUnknownTag -->
+            <slot name="elements" />
+        </ul>
+
+        <slot name="after-elements"/>
+    </div>
+</Layout>

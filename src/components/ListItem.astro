@@ -1,0 +1,41 @@
+---
+interface Props {
+    href: string
+}
+
+// Props destructuring
+const { href } = Astro.props;
+---
+
+<!-- Single list item component with custom styling -->
+<li class="list-group-item p-4 bg-dark rounded mb-3 shadow-lg theme-item">
+    <a href={href} class="text-decoration-none text-light theme-link">
+        <slot/>
+    </a>
+</li>
+
+<style>
+    /* Custom hover effect for list items */
+    .theme-item {
+        background-color: #343a40; /* Dark gray background */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    /* Darker background and increased shadow on hover */
+    .theme-item:hover {
+        background-color: #2c3035; /* Darker gray on hover */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+        transform: translateY(-3px); /* Slight lift effect on hover */
+    }
+
+    /* Larger font size and more vibrant color for links */
+    .theme-link {
+        font-size: 1.25rem; /* Larger font size */
+        font-weight: 600; /* Bold text for better visibility */
+        color: #f8f9fa; /* Lighter color for contrast against dark background */
+    }
+
+    .theme-link:hover {
+        color: #fff; /* Even lighter color on hover for emphasis */
+    }
+</style>

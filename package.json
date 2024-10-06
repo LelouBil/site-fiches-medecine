@@ -25,6 +25,10 @@
     "zod": "^3.23.8",
     "zod-to-json-schema": "^3.23.3",
     "@types/node": "^20.16.10",
-    "tsx": "^4.19.1"
+    "tsx": "^4.19.1",
+    "astro-bootstrap": "^0.7.0",
+    "boostrap": "^2.0.0",
+    "@popperjs/core": "^2.11.8",
+    "@types/bootstrap": "^5.2.10"
   }
 }

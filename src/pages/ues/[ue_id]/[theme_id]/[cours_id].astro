@@ -1,6 +1,7 @@
 ---
-import Cours from "../../../../layouts/Cours.astro";
-import {arborescence_cours} from "../../../../lib/files";
+import {arborescence_cours} from "@/lib/files";
+import Layout from "@/layouts/Layout.astro";
+import MainHeader from "../../../../components/MainHeader.astro";
 export function getStaticPaths() {
     // for each ue and theme and cours pair
     return arborescence_cours.flatMap((ue) => {
@@ -18,13 +19,32 @@ const theme = ue.themes.find(theme => theme.id === theme_id)!;
 const cours = theme.cours.find(cours => cours.id === cours_id)!;
 ---
 
-<Cours title=`Un cours ${cours}`>
-    <h1> Je suis le cours {cours.name} dans le theme {theme.name} de l'UE {ue.name}</h1>
-    <h3>Fiches : </h3>
+<Layout title=`${ue.name} > ${theme.name} > ${cours.name}`>
+    <MainHeader>{cours.name}</MainHeader>
+    <hr class="mb-5 "/>
+    <h3>Fiches </h3>
     {cours.fiches.map(fiche => (
-            <object data={fiche.embed_url} type="application/pdf" width="100%" height="100%">
-            </object>
-            <a href={fiche.download_url}>{fiche.name}</a>
-    ))
+            <div class="card mb-3">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <div class="mb-3 justify-content-center align-items-center" style="width: 100%; margin-left: 3em; margin-right: 3em">
+                        <object data={fiche.embed_url} type="application/pdf"
+                                class="pdf-embed">
+                            <p>Impossible d'afficher l'apercu <a href={fiche.download_url}>TéléchargerPDF</a>.</p>
+                        </object>
+                    </div>
+                    <a href={fiche.download_url} class="btn btn-primary btn-lg btn-block">Télécharger {fiche.name}</a>
+                </div>
+            </div>
+    ))}
+    <div id="questions" class="mt-5">
+        <!-- Future questions will be added here -->
+    </div>
+</Layout>
+
+<style>
+
+    .pdf-embed {
+        width: 100%;
+        height: 30em;
     }
-</Cours>
+</style>

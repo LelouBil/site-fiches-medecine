@@ -1,0 +1,28 @@
+---
+import {arborescence_cours} from "../../../../lib/files";
+import ListItem from "@/components/ListItem.astro";
+import ListPage from "@/layouts/ListPage.astro";
+export function getStaticPaths() {
+    // for each ue and theme pair
+    return arborescence_cours.flatMap((ue) => {
+        return ue.themes.map((theme) => {
+            return {params: {ue_id: ue.id, theme_id: theme.id}}
+        })
+    })
+}
+
+const {ue_id, theme_id} = Astro.params;
+const ue = arborescence_cours.find(ue => ue.id === ue_id)!;
+const theme = ue.themes.find(theme => theme.id === theme_id)!;
+---
+
+<ListPage title=`${ue.name} > ${theme.name}`>
+    <p slot="header">Cours: {theme.name}</p>
+    <Fragment slot="elements">
+        {theme.cours.map(cours => (
+                <ListItem href={`${cours.id}`}>
+                    {cours.name}
+                </ListItem>
+        ))}
+    </Fragment>
+</ListPage>

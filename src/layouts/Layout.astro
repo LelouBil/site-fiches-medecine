@@ -1,0 +1,74 @@
+---
+import "./bootstrap.min.css";
+import {Breadcrumb} from "astro-bootstrap";
+import {arborescence_cours} from "../lib/files";
+import {ViewTransitions} from "astro:transitions"
+
+interface Props {
+    title: string;
+}
+
+const {title} = Astro.props;
+
+const breadcrumbs: { name: string, url: string }[] = []
+
+let path = Astro.url.pathname.replace(import.meta.env.BASE_URL, "").split("/");
+if (path[0] === "") {
+    path.shift()
+}
+if (path.length >= 0) {
+    breadcrumbs.push({name: "Acceuil", url: import.meta.env.BASE_URL})
+}
+console.log(path)
+if (path.length >= 1) {
+    if (path[0] === "ues") {
+        breadcrumbs.push({name: "UEs", url: import.meta.env.BASE_URL + "/ues"})
+        if (path.length >= 2) {
+            let ue = arborescence_cours.find(ue => ue.id === path[1])!
+            breadcrumbs.push({name: ue.name, url: import.meta.env.BASE_URL + `/ues/${ue.id}`})
+            if (path.length >= 3) {
+                let theme = ue.themes.find(theme => theme.id === path[2])!
+                breadcrumbs.push({name: theme.name, url: import.meta.env.BASE_URL + `/ues/${ue.id}/${theme.id}`})
+                if (path.length >= 4) {
+                    let cours = theme.cours.find(cours => cours.id === path[3])!
+                    breadcrumbs.push({
+                        name: cours.name,
+                        url: import.meta.env.BASE_URL + `/ues/${ue.id}/${theme.id}/${cours.id}`
+                    })
+                }
+            }
+        }
+    } else {
+        console.log("Todo breadcrumbs")
+    }
+}
+---
+
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content="Fiches de cours de médecine"/>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="generator" content={Astro.generator}/>
+    <base href={Astro.url.pathname + "/"}/>
+    <ViewTransitions/>
+    <title>{title}</title>
+</head>
+<body>
+<Breadcrumb>
+    {breadcrumbs.map(breadcrumb => (
+            <Breadcrumb.Item><a href={breadcrumb.url}>{breadcrumb.name}</a></Breadcrumb.Item>
+    ))}
+</Breadcrumb>
+<slot/>
+</body>
+</html>
+<style is:global>
+
+    html {
+        padding: 2em;
+    }
+
+</style>
