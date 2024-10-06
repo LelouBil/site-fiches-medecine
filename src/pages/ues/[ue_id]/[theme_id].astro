@@ -1,0 +1,26 @@
+---
+import {arborescence_cours} from "@/lib/files";
+import Liste from "@/layouts/Liste.astro";
+export function getStaticPaths() {
+   // for each ue and theme pair
+    return arborescence_cours.flatMap((ue) => {
+        return ue.themes.map((theme) => {
+            return {params: {ue_id: ue.id, theme_id: theme.id}}
+        })
+    })
+}
+
+const {ue_id, theme_id} = Astro.params;
+const ue = arborescence_cours.find(ue => ue.id === ue_id)!;
+const theme = ue.themes.find(theme => theme.id === theme_id)!;
+---
+<Liste title=`Liste des Cours dans le theme ${theme.name}`>
+    <h1>Liste des Cours dans {theme.name}</h1>
+    <ul>
+        {theme.cours.map(cours => (
+                <li>
+                    <a href={new URL(`${theme.id}/${cours.id}`,Astro.url).pathname}>{cours.name}</a>
+                </li>
+        ))}
+    </ul>
+</Liste>

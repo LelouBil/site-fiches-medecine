@@ -1,0 +1,15 @@
+---
+
+import Liste from "../layouts/Liste.astro";
+import {arborescence_cours} from "../lib/files";---
+
+<Liste title="Liste des UEs">
+    <h1>Liste des UEs</h1>
+    <ul>
+        {arborescence_cours.map(ue => (
+            <li>
+                <a href={new URL(`ues/${ue.id}`,Astro.url).pathname}>{ue.name}</a>
+            </li>
+        ))}
+    </ul>
+</Liste>

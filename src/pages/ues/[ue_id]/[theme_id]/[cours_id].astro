@@ -1,0 +1,30 @@
+---
+import Cours from "../../../../layouts/Cours.astro";
+import {arborescence_cours} from "../../../../lib/files";
+export function getStaticPaths() {
+    // for each ue and theme and cours pair
+    return arborescence_cours.flatMap((ue) => {
+        return ue.themes.flatMap((theme) => {
+            return theme.cours.map((cours) => {
+                return {params: {ue_id: ue.id, theme_id: theme.id, cours_id: cours.id}}
+            })
+        })
+    })
+}
+
+const {ue_id, theme_id, cours_id} = Astro.params;
+const ue = arborescence_cours.find(ue => ue.id === ue_id)!;
+const theme = ue.themes.find(theme => theme.id === theme_id)!;
+const cours = theme.cours.find(cours => cours.id === cours_id)!;
+---
+
+<Cours title=`Un cours ${cours}`>
+    <h1> Je suis le cours {cours.name} dans le theme {theme.name} de l'UE {ue.name}</h1>
+    <h3>Fiches : </h3>
+    {cours.fiches.map(fiche => (
+            <object data={fiche.embed_url} type="application/pdf" width="100%" height="50%">
+            </object>
+            <a href={fiche.download_url}>{fiche.name}</a>
+    ))
+    }
+</Cours>

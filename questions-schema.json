@@ -1,0 +1,159 @@
+{
+  "$ref": "#/definitions/Question",
+  "definitions": {
+    "questionBase": {
+      "type": "object",
+      "properties": {
+        "texte": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Le texte de la question"
+        },
+        "difficulte": {
+          "type": "string",
+          "enum": [
+            "facile",
+            "moyen",
+            "difficile",
+            "impossible"
+          ],
+          "description": "La difficulté de la question"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Les tags de la question"
+        }
+      },
+      "required": [
+        "texte",
+        "difficulte",
+        "tags"
+      ],
+      "additionalProperties": true
+    },
+    "qcmQuestion": {
+      "type": "object",
+      "properties": {
+        "texte": {
+          "$ref": "#/definitions/questionBase/properties/texte"
+        },
+        "difficulte": {
+          "$ref": "#/definitions/questionBase/properties/difficulte"
+        },
+        "tags": {
+          "$ref": "#/definitions/questionBase/properties/tags"
+        },
+        "type": {
+          "type": "string",
+          "const": "qcm",
+          "description": "Le type de question"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "texte": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Le texte de la proposition"
+              },
+              "correcte": {
+                "type": "boolean",
+                "description": "La proposition est-elle correcte ?"
+              }
+            },
+            "required": [
+              "texte",
+              "correcte"
+            ],
+            "additionalProperties": true
+          },
+          "minItems": 2,
+          "description": "Les propositions de la question"
+        }
+      },
+      "required": [
+        "texte",
+        "difficulte",
+        "tags",
+        "type",
+        "options"
+      ],
+      "additionalProperties": true
+    },
+    "texteQuestion": {
+      "type": "object",
+      "properties": {
+        "texte": {
+          "$ref": "#/definitions/questionBase/properties/texte"
+        },
+        "difficulte": {
+          "$ref": "#/definitions/questionBase/properties/difficulte"
+        },
+        "tags": {
+          "$ref": "#/definitions/questionBase/properties/tags"
+        },
+        "type": {
+          "type": "string",
+          "const": "texte",
+          "description": "Le type de question"
+        },
+        "reponses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "description": "Les réponses de la question"
+        }
+      },
+      "required": [
+        "texte",
+        "difficulte",
+        "tags",
+        "type",
+        "reponses"
+      ],
+      "additionalProperties": true
+    },
+    "Question": {
+      "type": "object",
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/qcmQuestion"
+              },
+              {
+                "$ref": "#/definitions/texteQuestion"
+              }
+            ]
+          },
+          "minItems": 1,
+          "description": "Les questions du fichier"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/questionBase/properties/tags/items"
+          },
+          "description": "Les tags communs à toutes les questions"
+        }
+      },
+      "required": [
+        "questions",
+        "tags"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
