@@ -77,7 +77,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
                 themes: themes
             });
         }
-        ueFolders.sort((a, b) => a.name.localeCompare(b.name));
     }
+    ues.sort((a, b) => a.name.localeCompare(b.name));
     return ues;
 }
