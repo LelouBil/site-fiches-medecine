@@ -3,7 +3,7 @@ import "./bootstrap.min.css";
 import {Breadcrumb, Navbar} from "astro-bootstrap";
 import type {NavbarItemType} from 'astro-bootstrap';
 import {arborescence_cours} from "../lib/files";
-import {ViewTransitions} from "astro:transitions"
+// import {ViewTransitions} from "astro:transitions"
 
 interface Props {
     title: string;
@@ -61,7 +61,7 @@ if (path.length >= 1) {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="generator" content={Astro.generator}/>
     <base href={Astro.url.pathname + "/"}/>
-    <ViewTransitions/>
+    <!--<ViewTransitions/>-->
     <title>{title}</title>
 </head>
 <body>
