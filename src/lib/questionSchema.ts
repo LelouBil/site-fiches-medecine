@@ -4,32 +4,33 @@ import {zodToJsonSchema} from "zod-to-json-schema";
 import * as fs from "node:fs";
 
 
-const difficultyEnum = z.enum(["facile", "moyen", "difficile", "impossible"])
+export const difficultyEnum = z.enum(["easy", "medium", "hard", "impossible"])
 
 const tagArray = z.array(z.string().min(1))
 
 const questionBase = z.object({
-    texte: z.string().min(1).describe("Le texte de la question"),
-    difficulte: difficultyEnum.describe("La difficulté de la question"),
+    text: z.string().min(1).describe("Le texte de la question"),
+    difficulty: difficultyEnum.describe("La difficulté de la question"),
     tags: tagArray.describe("Les tags de la question")
 }).required()
 
 const qcmQuestion = questionBase.merge(z.object({
-    type: z.literal("qcm").describe("Le type de question"),
+    type: z.literal("choices").describe("Le type de question"),
+    randomizeOrder: z.boolean().default(true).describe("Les propositions sont-elles dans un ordre aléatoire ?"),
     options: z.array(z.object({
-        texte: z.string().min(1).describe("Le texte de la proposition"),
-        correcte: z.boolean().describe("La proposition est-elle correcte ?")
+        text: z.string().min(1).describe("Le texte de la proposition"),
+        correct: z.boolean().describe("La proposition est-elle correcte ?")
     }))
         .min(2)
-        .refine(data => data.some(option => option.correcte), {
+        .refine(data => data.some(option => option.correct), {
             message: "Il doit y avoir au moins une proposition correcte"
         })
         .describe("Les propositions de la question")
 }))
 
 const texteQuestion = questionBase.merge(z.object({
-    type: z.literal("texte").describe("Le type de question"),
-    reponses: z.array(z.string().min(1)).min(1).describe("Les réponses de la question")
+    type: z.literal("text").describe("Le type de question"),
+    answers: z.array(z.string().min(1)).min(1).describe("Les réponses de la question")
 }))
 
 export const questionSchema = z.discriminatedUnion("type", [qcmQuestion, texteQuestion])

@@ -4,17 +4,17 @@
     "questionBase": {
       "type": "object",
       "properties": {
-        "texte": {
+        "text": {
           "type": "string",
           "minLength": 1,
           "description": "Le texte de la question"
         },
-        "difficulte": {
+        "difficulty": {
           "type": "string",
           "enum": [
-            "facile",
-            "moyen",
-            "difficile",
+            "easy",
+            "medium",
+            "hard",
             "impossible"
           ],
           "description": "La difficulté de la question"
@@ -29,8 +29,8 @@
         }
       },
       "required": [
-        "texte",
-        "difficulte",
+        "text",
+        "difficulty",
         "tags"
       ],
       "additionalProperties": true
@@ -38,38 +38,43 @@
     "qcmQuestion": {
       "type": "object",
       "properties": {
-        "texte": {
-          "$ref": "#/definitions/questionBase/properties/texte"
+        "text": {
+          "$ref": "#/definitions/questionBase/properties/text"
         },
-        "difficulte": {
-          "$ref": "#/definitions/questionBase/properties/difficulte"
+        "difficulty": {
+          "$ref": "#/definitions/questionBase/properties/difficulty"
         },
         "tags": {
           "$ref": "#/definitions/questionBase/properties/tags"
         },
         "type": {
           "type": "string",
-          "const": "qcm",
+          "const": "choices",
           "description": "Le type de question"
+        },
+        "randomizeOrder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Les propositions sont-elles dans un ordre aléatoire ?"
         },
         "options": {
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
-              "texte": {
+              "text": {
                 "type": "string",
                 "minLength": 1,
                 "description": "Le texte de la proposition"
               },
-              "correcte": {
+              "correct": {
                 "type": "boolean",
                 "description": "La proposition est-elle correcte ?"
               }
             },
             "required": [
-              "texte",
-              "correcte"
+              "text",
+              "correct"
             ],
             "additionalProperties": true
           },
@@ -78,8 +83,8 @@
         }
       },
       "required": [
-        "texte",
-        "difficulte",
+        "text",
+        "difficulty",
         "tags",
         "type",
         "options"
@@ -89,21 +94,21 @@
     "texteQuestion": {
       "type": "object",
       "properties": {
-        "texte": {
-          "$ref": "#/definitions/questionBase/properties/texte"
+        "text": {
+          "$ref": "#/definitions/questionBase/properties/text"
         },
-        "difficulte": {
-          "$ref": "#/definitions/questionBase/properties/difficulte"
+        "difficulty": {
+          "$ref": "#/definitions/questionBase/properties/difficulty"
         },
         "tags": {
           "$ref": "#/definitions/questionBase/properties/tags"
         },
         "type": {
           "type": "string",
-          "const": "texte",
+          "const": "text",
           "description": "Le type de question"
         },
-        "reponses": {
+        "answers": {
           "type": "array",
           "items": {
             "type": "string",
@@ -114,11 +119,11 @@
         }
       },
       "required": [
-        "texte",
-        "difficulte",
+        "text",
+        "difficulty",
         "tags",
         "type",
-        "reponses"
+        "answers"
       ],
       "additionalProperties": true
     },

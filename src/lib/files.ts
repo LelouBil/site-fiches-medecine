@@ -50,6 +50,14 @@ export const arborescence_cours: AllCours = await get_arborescence_cours()
 
 export const all_questions: FullQuestion[] = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => theme.cours.flatMap(cours => cours.questions_qcm )))
 
+export const all_ue = arborescence_cours.map(ue => ue.id)
+export const all_themes = arborescence_cours.flatMap(ue => ue.themes.map(theme => theme.id))
+export const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => theme.cours.map(cours => cours.id)))
+export const all_tags = [... new Set(all_questions.flatMap(question => question.tags))]
+export const all_difficulty = [... new Set(all_questions.map(question => question.difficulty))]
+export const all_types = [... new Set(all_questions.map(question => question.type))]
+
+
 async function get_arborescence_cours(): Promise<AllCours> {
     const ues: UE[] = [];
     const ueFolders = await drive.files_in_folder(drive.ROOT_FOLDER_ID, drive.FilterType.Folders);
@@ -74,6 +82,9 @@ async function get_arborescence_cours(): Promise<AllCours> {
                             const questions_qcm = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
                                 ?.find(fiche => fiche.name == "questions.json");
                             fiches.sort((a, b) => a.name.localeCompare(b.name));
+                            if (questions_qcm) {
+                                console.log(`Parsing ${dossier_ue.name}/${dossier_theme.name}/${dossier_cours.name}/questions.json`);
+                            }
                             const parse = questions_qcm ? questionFileSchema.parse(await drive.get_file_content(questions_qcm.id!)) : null;
                             const questions: FullQuestion[] = (parse?.questions ?? []).map(question => ({
                                 ...question,

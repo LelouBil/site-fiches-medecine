@@ -2,12 +2,13 @@
 import Layout from "@/layouts/Layout.astro";
 import QCM from "@/components/QCM.svelte";
 
-import {all_questions} from "@/lib/files";
+
+
 ---
 
 <Layout title="Site de fiches">
     <h1>QCMs</h1>
 
-    <QCM questions={all_questions} />
+    <QCM default_filters={{}} />
 
 </Layout>
