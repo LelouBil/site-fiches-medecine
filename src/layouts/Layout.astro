@@ -61,7 +61,7 @@ if (path.length >= 1) {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="generator" content={Astro.generator}/>
     <base href={Astro.url.pathname + "/"}/>
-    <!--<ViewTransitions/>-->
+    <ViewTransitions/>
     <title>{title}</title>
 </head>
 <body>
@@ -99,11 +99,6 @@ if (path.length >= 1) {
     import '@algolia/autocomplete-theme-classic';
     import {ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY} from "astro:env/client";
     import {pagesIndexName} from "../lib/pagesIndexName";
-    import {
-        createRedirectUrlPlugin,
-    } from "@algolia/autocomplete-plugin-redirect-url";
-
-
 
 
     const searchClient = algoliaSearch(
@@ -169,7 +164,6 @@ if (path.length >= 1) {
                             }
                         },
 
-                        // ...
                     },
                 ];
             }
