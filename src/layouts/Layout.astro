@@ -94,8 +94,8 @@ if (path.length >= 1) {
 </style>
 <script>
     import {liteClient as algoliaSearch} from 'algoliasearch/lite';
-    import {autocomplete, AutocompleteSource, getAlgoliaResults} from '@algolia/autocomplete-js';
-
+    import {autocomplete, getAlgoliaResults} from '@algolia/autocomplete-js';
+    import type {AutocompleteSource} from '@algolia/autocomplete-js';
     import '@algolia/autocomplete-theme-classic';
     import {ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY} from "astro:env/client";
     import {pagesIndexName} from "../lib/pagesIndexName";
