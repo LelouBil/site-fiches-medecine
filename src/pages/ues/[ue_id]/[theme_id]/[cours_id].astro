@@ -2,6 +2,8 @@
 import {arborescence_cours} from "@/lib/files";
 import Layout from "@/layouts/Layout.astro";
 import MainHeader from "../../../../components/MainHeader.astro";
+import {defaultFilters} from "../../../../lib/qcmFilters";
+import QCMWrapper from "../../../../components/QCMWrapper.astro";
 export function getStaticPaths() {
     // for each ue and theme and cours pair
     return arborescence_cours.flatMap((ue) => {
@@ -37,6 +39,10 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
                 </div>
             </div>
     ))}
+
+
+    <QCMWrapper preSetFilters={{...defaultFilters,included_ue: [ue.id],included_themes: [theme.id], included_cours: [cours.id]}}/>
+
     <div id="questions" class="mt-5">
         <!-- Future questions will be added here -->
     </div>

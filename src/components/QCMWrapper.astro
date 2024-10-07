@@ -1,0 +1,25 @@
+---
+import QCM from "@/components/QCM.svelte"
+import {all_cours, all_difficulty, all_questions, all_tags, all_themes, all_types, all_ue} from "../lib/files";
+import {defaultFilters} from "../lib/qcmFilters";
+import type {QcmFilters} from "../lib/qcmFilters";
+
+interface Props{
+    preSetFilters?: QcmFilters
+}
+
+const {preSetFilters} = Astro.props
+
+---
+<QCM
+        all_questions={all_questions}
+        all_cours={all_cours}
+        all_themes={all_themes}
+        all_ue={all_ue}
+        all_tags={all_tags}
+        all_types={all_types}
+        all_difficulty={all_difficulty}
+        defaultFilters={defaultFilters}
+        preSetFilters={preSetFilters ?? null}
+        client:load
+/>

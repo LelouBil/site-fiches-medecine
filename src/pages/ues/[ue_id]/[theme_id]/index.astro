@@ -2,6 +2,8 @@
 import {arborescence_cours} from "../../../../lib/files";
 import ListItem from "@/components/ListItem.astro";
 import ListPage from "@/layouts/ListPage.astro";
+import {defaultFilters} from "../../../../lib/qcmFilters";
+import QCMWrapper from "../../../../components/QCMWrapper.astro";
 export function getStaticPaths() {
     // for each ue and theme pair
     return arborescence_cours.flatMap((ue) => {
@@ -24,5 +26,9 @@ const theme = ue.themes.find(theme => theme.id === theme_id)!;
                     {cours.name}
                 </ListItem>
         ))}
+    </Fragment>
+
+    <Fragment slot="after-elements">
+        <QCMWrapper preSetFilters={{...defaultFilters, included_ue: [ue.id], included_themes: [theme.id]}}/>
     </Fragment>
 </ListPage>

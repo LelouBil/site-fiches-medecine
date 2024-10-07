@@ -1,46 +1,64 @@
 <script lang="ts">
-    // import type {FullQuestion} from "@/lib/files.ts";
-    //
-    // export let questions: FullQuestion[]
-    import {all_cours, all_difficulty, all_questions, all_tags, all_themes, all_types, all_ue} from "@/lib/files.ts";
+    import type {FullQuestion} from "@/lib/files.ts";
+    import type {Difficulty, QuestionType} from "@/lib/questionSchema.ts";
+
     import type {QcmFilters} from "@/lib/qcmFilters.ts";
 
-    export const default_filters: QcmFilters = {
-        included_ue: all_ue,
-        excluded_ue: [],
-        included_themes: all_themes,
-        excluded_themes: [],
-        included_cours: all_cours,
-        excluded_cours: [],
-        included_tags: all_tags,
-        excluded_tags: [],
-        included_difficulty: all_difficulty,
-        excluded_difficulty: [],
-        included_type: all_types,
-        excluded_type: []
+    export let all_questions: FullQuestion[];
+    export let all_cours: string[];
+    export let all_difficulty: Difficulty[];
+    export let all_tags: string[];
+    export let all_themes: string[];
+    export let all_types: QuestionType[];
+    export let all_ue: string[];
+    export let preSetFilters: QcmFilters | null = null;
+    export let defaultFilters: QcmFilters;
+
+    const question_filters: QcmFilters = preSetFilters ?? defaultFilters;
+
+
+
+    function prepareQCM() {
+        questions = all_questions.filter(q => {
+            return question_filters.included_ue.includes(q.ue_id) &&
+                !question_filters.excluded_ue.includes(q.ue_id) &&
+                question_filters.included_themes.includes(q.theme_id) &&
+                !question_filters.excluded_themes.includes(q.theme_id) &&
+                question_filters.included_cours.includes(q.cours_id) &&
+                !question_filters.excluded_cours.includes(q.cours_id) &&
+                question_filters.included_tags.some(t => q.tags.includes(t)) &&
+                !question_filters.excluded_tags.some(t => q.tags.includes(t)) &&
+                question_filters.included_difficulty.includes(q.difficulty) &&
+                !question_filters.excluded_difficulty.includes(q.difficulty) &&
+                question_filters.included_type.includes(q.type) &&
+                !question_filters.excluded_type.includes(q.type)
+        })
     }
 
-   const questions = all_questions.filter(q => {
-        return default_filters.included_ue.includes(q.ue_id) &&
-            !default_filters.excluded_ue.includes(q.ue_id) &&
-            default_filters.included_themes.includes(q.theme_id) &&
-            !default_filters.excluded_themes.includes(q.theme_id) &&
-            default_filters.included_cours.includes(q.cours_id) &&
-            !default_filters.excluded_cours.includes(q.cours_id) &&
-            default_filters.included_tags.some(t => q.tags.includes(t)) &&
-            !default_filters.excluded_tags.some(t => q.tags.includes(t)) &&
-            default_filters.included_difficulty.includes(q.difficulte) &&
-            !default_filters.excluded_difficulty.includes(q.difficulte) &&
-            default_filters.included_type.includes(q.type) &&
-            !default_filters.excluded_type.includes(q.type)
-    })
 
-    console.log("bonjour")
+    let questions: FullQuestion[] = []
+
+    if (preSetFilters != null) {
+        prepareQCM()
+    }
+
 </script>
 
-<p>TEST ({questions.length})</p>
-<ul>{#each questions as question, i}<li>{i} - <pre>{JSON.stringify(question, null, 2)}</pre></li>{/each}</ul>
 
+{#if questions.length === 0}
+    <p>SETUP DES FILTRES</p>
+    <button on:click={prepareQCM}> Start</button>
+{:else}
+    <p>QCM ({questions.length})</p>
+    <ul>
+        {#each questions as question, i}
+            <li>{i} -
+                <pre>{JSON.stringify(question, null, 2)}</pre>
+            </li>
+        {/each}
+    </ul>
+
+{/if}
 <style>
 
 </style>

@@ -1,8 +1,8 @@
 import {getSecret} from 'astro:env/server'
 import {algoliasearch} from "algoliasearch";
-import type {AllCours} from "@/lib/files.ts";
 import {ALGOLIA_APP_ID} from "astro:env/client";
 import {pagesIndexName} from "@/lib/pagesIndexName.ts";
+import type {AllCours} from "@/lib/files.ts";
 
 const client = algoliasearch(ALGOLIA_APP_ID, getSecret('ALGOLIA_API_KEY')!);
 
