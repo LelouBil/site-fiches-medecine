@@ -16,7 +16,7 @@ export default defineConfig({
                 ALGOLIA_APP_ID: envField.string({context: "client", access: "public"}),
                 ALGOLIA_API_KEY: envField.string({context: "server", access: "secret"}),
                 ALGOLIA_SEARCH_KEY: envField.string({context: "client", access: "public"}),
-                GITHUB_REF: envField.string({context: "client", access: "public"}),
+                GITHUB_REF_NAME: envField.string({context: "client", access: "public"}),
             },
             validateSecrets: true,
         }
