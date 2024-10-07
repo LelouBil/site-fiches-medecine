@@ -94,7 +94,7 @@ if (path.length >= 1) {
 </style>
 <script>
     import {liteClient as algoliaSearch} from 'algoliasearch/lite';
-    import {autocomplete, getAlgoliaResults} from '@algolia/autocomplete-js';
+    import {autocomplete, AutocompleteSource, getAlgoliaResults} from '@algolia/autocomplete-js';
 
     import '@algolia/autocomplete-theme-classic';
     import {ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY} from "astro:env/client";
@@ -114,57 +114,58 @@ if (path.length >= 1) {
             // plugins: [redirectUrlPlugin],
             insights: true,
             getSources({query}) {
-                return [
-                    {
-                        sourceId: 'pages',
-                        getItems() {
-                            return getAlgoliaResults({
-                                searchClient,
-                                queries: [
-                                    {
-                                        indexName: pagesIndexName,
-                                        params: {
-                                            query,
-                                            hitsPerPage: 5,
-                                        },
+                let newVar: AutocompleteSource<any> = {
+                    sourceId: 'pages',
+                    getItems() {
+                        return getAlgoliaResults({
+                            searchClient,
+                            queries: [
+                                {
+                                    indexName: pagesIndexName,
+                                    params: {
+                                        query,
+                                        hitsPerPage: 5,
                                     },
-                                ],
-                            });
-                        },
-                        getItemUrl({item}) {
-                            return item.url;
-                        },
-                        getItemInputValue({item}) {
-                            return item.name;
-                        },
-                        templates: {
-                            item({item, components, html}) {
-                                return html`
-                                    <a class="aa-ItemLink d-block" href=${import.meta.env.BASE_URL +  item.url}>
-                                        <div class="aa-ItemWrapper">
-                                            <div class="aa-ItemContent">
-                                                <div class="aa-ItemContentBody">
-                                                    <div class="aa-ItemContentTitle">
-                                                        ${components.Highlight({
-                                                            hit: item,
-                                                            attribute: 'name',
-                                                        })}
-                                                    </div>
-                                                    <div class="aa-ItemContentDescription">
-                                                        ${components.Snippet({
-                                                            hit: item,
-                                                            attribute: 'type',
-                                                        })}
-                                                    </div>
+                                },
+                            ],
+                        });
+                    },
+                    getItemUrl({item}) {
+                        return item.url;
+                    },
+                    getItemInputValue({item}) {
+                        return item.name;
+                    },
+                    templates: {
+                        item({item, components, html}) {
+                            return html`
+                                <a class="aa-ItemLink d-block" href=${import.meta.env.BASE_URL +  item.url}>
+                                    <div class="aa-ItemWrapper">
+                                        <div class="aa-ItemContent">
+                                            <div class="aa-ItemContentBody">
+                                                <div class="aa-ItemContentTitle">
+                                                    ${components.Highlight({
+                                                        hit: item,
+                                                        attribute: 'name',
+                                                    })}
+                                                </div>
+                                                <div class="aa-ItemContentDescription">
+                                                    ${components.Snippet({
+                                                        hit: item,
+                                                        attribute: 'type',
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>
-                                    </a>
-                                `;
-                            }
-                        },
-
+                                    </div>
+                                </a>
+                            `;
+                        }
                     },
+
+                };
+                return [
+                    newVar,
                 ];
             }
         }
