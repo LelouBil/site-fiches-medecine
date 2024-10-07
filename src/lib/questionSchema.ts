@@ -32,7 +32,7 @@ const texteQuestion = questionBase.merge(z.object({
     reponses: z.array(z.string().min(1)).min(1).describe("Les réponses de la question")
 }))
 
-const questionSchema = z.discriminatedUnion("type", [qcmQuestion, texteQuestion])
+export const questionSchema = z.discriminatedUnion("type", [qcmQuestion, texteQuestion])
 
 export const questionFileSchema = z.object({
     questions: z.array(questionSchema).min(1).describe("Les questions du fichier"),

@@ -1,5 +1,5 @@
 import type {z} from "zod"
-import {questionFileSchema} from "@/lib/questionSchema";
+import {questionFileSchema, questionSchema} from "@/lib/questionSchema";
 import * as drive from "@/lib/drive"
 import {buildPagesIndex} from "@/lib/algolia.ts";
 
@@ -10,11 +10,18 @@ type Fiche = {
     embed_url: string
 }
 
+export type FullQuestion = {
+    ue_id: string,
+    theme_id: string,
+    cours_id: string,
+} & z.infer<typeof questionSchema>
+
+
 type Cours = {
     name: string,
     id: string,
     fiches: Fiche[],
-    questions_qcm: z.infer<typeof questionFileSchema> | null,
+    questions_qcm: FullQuestion[],
 }
 
 type Themes = {
@@ -41,6 +48,8 @@ function normalizeName(name: string): string {
 
 export const arborescence_cours: AllCours = await get_arborescence_cours()
 
+export const all_questions: FullQuestion[] = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => theme.cours.flatMap(cours => cours.questions_qcm )))
+
 async function get_arborescence_cours(): Promise<AllCours> {
     const ues: UE[] = [];
     const ueFolders = await drive.files_in_folder(drive.ROOT_FOLDER_ID, drive.FilterType.Folders);
@@ -65,11 +74,19 @@ async function get_arborescence_cours(): Promise<AllCours> {
                             const questions_qcm = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
                                 ?.find(fiche => fiche.name == "questions.json");
                             fiches.sort((a, b) => a.name.localeCompare(b.name));
+                            const parse = questions_qcm ? questionFileSchema.parse(await drive.get_file_content(questions_qcm.id!)) : null;
+                            const questions: FullQuestion[] = (parse?.questions ?? []).map(question => ({
+                                ...question,
+                                tags: [...question.tags, ...(parse?.tags ?? [])],
+                                ue_id: normalizeName(dossier_ue.name),
+                                theme_id: normalizeName(dossier_theme.name),
+                                cours_id: normalizeName(dossier_cours.name)
+                            }));
                             cours.push({
                                 name: dossier_cours.name,
                                 id: normalizeName(dossier_cours.name),
                                 fiches: fiches!,
-                                questions_qcm: questions_qcm ? questionFileSchema.parse(await drive.get_file_content(questions_qcm.id!)) : null
+                                questions_qcm: questions
                             });
                         }
                     }

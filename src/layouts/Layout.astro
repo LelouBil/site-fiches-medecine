@@ -3,7 +3,7 @@ import "./bootstrap.min.css";
 import {Breadcrumb, Navbar} from "astro-bootstrap";
 import type {NavbarItemType} from 'astro-bootstrap';
 import {arborescence_cours} from "../lib/files";
-import {ViewTransitions} from "astro:transitions"
+// import {ViewTransitions} from "astro:transitions"
 
 interface Props {
     title: string;
@@ -70,7 +70,7 @@ const navBarId = "navbarTogglerTarget"
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="generator" content={Astro.generator}/>
     <base href={Astro.url.pathname + "/"}/>
-    <ViewTransitions/>
+    <!--<ViewTransitions/>-->
     <title>{title}</title>
 </head>
 <body>
@@ -100,12 +100,9 @@ const navBarId = "navbarTogglerTarget"
 </main>
 </body>
 </html>
-
-<script>
-    import "bootstrap/dist/js/bootstrap.bundle.js"
-
-</script>
 <script >
+
+    import "bootstrap/dist/js/bootstrap.bundle"
     import {liteClient as algoliaSearch} from 'algoliasearch/lite';
     import {autocomplete,  getAlgoliaResults} from '@algolia/autocomplete-js';
     import type {AutocompleteSource} from '@algolia/autocomplete-js';
@@ -113,17 +110,16 @@ const navBarId = "navbarTogglerTarget"
     import {ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY} from "astro:env/client";
     import {pagesIndexName} from "../lib/pagesIndexName";
 
-
     const searchClient = algoliaSearch(
         ALGOLIA_APP_ID,
         ALGOLIA_SEARCH_KEY,
     )
 
-    document.addEventListener("astro:after-swap", () => {
-        // currentAutoComplete.destroy()
-        // currentAutoComplete.refresh()
-        attachSearch(document.getElementById("searchbox")!)
-    })
+    // document.addEventListener("astro:after-swap", () => {
+    //     // currentAutoComplete.destroy()
+    //     // currentAutoComplete.refresh()
+    //     attachSearch(document.getElementById("searchbox")!)
+    // })
     attachSearch(document.getElementById("searchbox")!)
 
     function attachSearch(element: HTMLElement) {
