@@ -1,9 +1,11 @@
 import type {z} from "zod"
 import {questionFileSchema} from "@/lib/questionSchema";
 import * as drive from "@/lib/drive"
+import {buildPagesIndex} from "@/lib/algolia.ts";
 
 type Fiche = {
     name: string,
+    id: string,
     download_url: string
     embed_url: string
 }
@@ -27,7 +29,15 @@ type UE = {
     themes: Themes[]
 }
 
-type AllCours = UE[]
+export type AllCours = UE[]
+
+function normalizeName(name: string): string {
+    return name.toLowerCase()
+        .normalize("NFKD")
+        .replace(/\p{Diacritic}/gu, "")
+        .replace(/[^a-z0-9]/g, "-")
+        .replace(/-{2,}/g, '-');
+}
 
 export const arborescence_cours: AllCours = await get_arborescence_cours()
 
@@ -47,6 +57,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
                             const fiches = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
                                 ?.filter(file => file.fileExtension == "pdf")
                                 .map(fiche => ({
+                                    id: normalizeName(fiche.name),
                                     name: fiche.name,
                                     download_url: fiche.webContentLink,
                                     embed_url: `https://drive.google.com/file/d/${fiche.id}/preview`
@@ -56,7 +67,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
                             fiches.sort((a, b) => a.name.localeCompare(b.name));
                             cours.push({
                                 name: dossier_cours.name,
-                                id: dossier_cours.id,
+                                id: normalizeName(dossier_cours.name),
                                 fiches: fiches!,
                                 questions_qcm: questions_qcm ? questionFileSchema.parse(await drive.get_file_content(questions_qcm.id!)) : null
                             });
@@ -65,7 +76,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
                     cours.sort((a, b) => a.name.localeCompare(b.name));
                     themes.push({
                         name: dossier_theme.name,
-                        id: dossier_theme.id,
+                        id: normalizeName(dossier_theme.name),
                         cours: cours
                     });
                 }
@@ -73,11 +84,12 @@ async function get_arborescence_cours(): Promise<AllCours> {
             themes.sort((a, b) => a.name.localeCompare(b.name));
             ues.push({
                 name: dossier_ue.name,
-                id: dossier_ue.id,
+                id: normalizeName(dossier_ue.name),
                 themes: themes
             });
         }
     }
     ues.sort((a, b) => a.name.localeCompare(b.name));
+    await buildPagesIndex(ues);
     return ues;
 }

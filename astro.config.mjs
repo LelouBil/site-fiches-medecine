@@ -13,6 +13,10 @@ export default defineConfig({
                 DRIVE_OAUTH2_CLIENT_SECRET: envField.string({context: "server", access: "secret"}),
                 DRIVE_OAUTH2_REFRESH_TOKEN: envField.string({context: "server", access: "secret"}),
                 DRIVE_FOLDER_ID: envField.string({context: "server", access: "secret"}),
+                ALGOLIA_APP_ID: envField.string({context: "client", access: "public"}),
+                ALGOLIA_API_KEY: envField.string({context: "server", access: "secret"}),
+                ALGOLIA_SEARCH_KEY: envField.string({context: "client", access: "public"}),
+                GITHUB_REF: envField.string({context: "client", access: "public"}),
             },
             validateSecrets: true,
         }

@@ -13,8 +13,8 @@ const {title} = Astro.props;
 
 const items: NavbarItemType[] = [
     // pull this in from a config file
-    {text: 'Accueil', href: import.meta.env.BASE_URL},
-    {text: 'Fiches', href: import.meta.env.BASE_URL + "/ues"},
+    {text: 'Accueil', href: import.meta.env.BASE_URL, linkClass: Astro.url.pathname == import.meta.env.BASE_URL + "/" ? "active": "" },
+    {text: 'Fiches', href: import.meta.env.BASE_URL + "/ues", linkClass: Astro.url.pathname.startsWith(import.meta.env.BASE_URL + "/ues") ? "active" : ""},
     {text: 'QCMs', href: import.meta.env.BASE_URL + "/qcms"},
 ];
 
@@ -61,7 +61,7 @@ if (path.length >= 1) {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="generator" content={Astro.generator}/>
     <base href={Astro.url.pathname + "/"}/>
-    <ViewTransitions/>
+    <!--<ViewTransitions/>-->
     <title>{title}</title>
 </head>
 <body>
@@ -71,9 +71,11 @@ if (path.length >= 1) {
             <a class="navbar-brand" href="#">Fiches medecine lol</a>
             <Navbar.Items {items} class="me-auto mb-2 mb-lg-0"/>
         </div>
+        <div id="searchbox" class="form-inline mb-lg-0 w-25 d-flex gap-3 me-5">
+        </div>
     </Navbar>
     <div class="ms-5 mb-4">
-        <Breadcrumb >
+        <Breadcrumb>
             {breadcrumbs.map(breadcrumb => (
                     <Breadcrumb.Item><a href={breadcrumb.url}>{breadcrumb.name}</a></Breadcrumb.Item>
             ))}
@@ -86,5 +88,91 @@ if (path.length >= 1) {
 </body>
 </html>
 <style is:global>
-
+    .aa-Autocomplete {
+        width: 100% !important;
+    }
 </style>
+<script>
+    import {liteClient as algoliaSearch} from 'algoliasearch/lite';
+    import {autocomplete, getAlgoliaResults} from '@algolia/autocomplete-js';
+
+    import '@algolia/autocomplete-theme-classic';
+    import {ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY} from "astro:env/client";
+    import {pagesIndexName} from "../lib/pagesIndexName";
+    import {
+        createRedirectUrlPlugin,
+    } from "@algolia/autocomplete-plugin-redirect-url";
+
+
+
+
+    const searchClient = algoliaSearch(
+        ALGOLIA_APP_ID,
+        ALGOLIA_SEARCH_KEY,
+    )
+
+
+    autocomplete({
+            container: "#searchbox",
+            placeholder: "Rechercher une fiche",
+            openOnFocus: true,
+            // plugins: [redirectUrlPlugin],
+            insights: true,
+            getSources({query}) {
+                return [
+                    {
+                        sourceId: 'pages',
+                        getItems() {
+                            return getAlgoliaResults({
+                                searchClient,
+                                queries: [
+                                    {
+                                        indexName: pagesIndexName,
+                                        params: {
+                                            query,
+                                            hitsPerPage: 5,
+                                        },
+                                    },
+                                ],
+                            });
+                        },
+                        getItemUrl({item}) {
+                            return item.url;
+                        },
+                        getItemInputValue({item}) {
+                            return item.name;
+                        },
+                        templates: {
+                            item({item, components, html}) {
+                                return html`
+                                    <a class="aa-ItemLink d-block" href=${import.meta.env.BASE_URL +  item.url}>
+                                        <div class="aa-ItemWrapper">
+                                            <div class="aa-ItemContent">
+                                                <div class="aa-ItemContentBody">
+                                                    <div class="aa-ItemContentTitle">
+                                                        ${components.Highlight({
+                                                            hit: item,
+                                                            attribute: 'name',
+                                                        })}
+                                                    </div>
+                                                    <div class="aa-ItemContentDescription">
+                                                        ${components.Snippet({
+                                                            hit: item,
+                                                            attribute: 'type',
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `;
+                            }
+                        },
+
+                        // ...
+                    },
+                ];
+            }
+        }
+    );
+</script>

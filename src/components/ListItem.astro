@@ -9,9 +9,10 @@ const { href } = Astro.props;
 
 <!-- Single list item component with custom styling -->
 <li class="list-group-item p-4 bg-dark rounded mb-3 shadow-lg theme-item">
-    <a href={href} class="text-decoration-none text-light theme-link">
+    <div class="text-decoration-none text-light theme-link">
         <slot/>
-    </a>
+    </div>
+    <a href={href} class="stretched-link"></a>
 </li>
 
 <style>
@@ -35,7 +36,4 @@ const { href } = Astro.props;
         color: #f8f9fa; /* Lighter color for contrast against dark background */
     }
 
-    .theme-link:hover {
-        color: #fff; /* Even lighter color on hover for emphasis */
-    }
 </style>

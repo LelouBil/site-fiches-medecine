@@ -24,15 +24,17 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
     <hr class="mb-5 "/>
     <h3>Fiches </h3>
     {cours.fiches.map(fiche => (
-            <div class="card mb-3">
+            <div class="card mb-3" id={fiche.id}>
                 <div class="card-body d-flex flex-row justify-content-around align-items-center py-2">
-                    <a href={fiche.download_url} class="btn btn-primary btn-mg btn-block w-100">Télécharger {fiche.name}</a>
-                    <div class="mb-3 justify-content-center align-items-center" style="width: 100%; margin-left: 3em; margin-right: 3em">
+                    <a href={fiche.download_url}
+                       class="btn btn-primary btn-mg btn-block w-100">Télécharger {fiche.name}</a>
+                    <div class="mb-3 justify-content-center align-items-center"
+                         style="width: 100%; margin-left: 3em; margin-right: 3em">
                         <details>
                             <summary>Afficher l'aperçu du PDF</summary>
                             <object data={fiche.embed_url} type="application/pdf" class="pdf-embed">
-                            <p>Impossible d'afficher l'apercu <a href={fiche.download_url}>TéléchargerPDF</a>.</p>
-                        </object>
+                                <p>Impossible d'afficher l'apercu <a href={fiche.download_url}>TéléchargerPDF</a>.</p>
+                            </object>
                         </details>
                     </div>
                 </div>
