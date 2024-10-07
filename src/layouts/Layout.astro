@@ -118,7 +118,6 @@ const navBarId = "navbarTogglerTarget"
         ALGOLIA_APP_ID,
         ALGOLIA_SEARCH_KEY,
     )
-    let currentAutoComplete: any = null
 
     document.addEventListener("astro:after-swap", () => {
         // currentAutoComplete.destroy()
@@ -129,7 +128,7 @@ const navBarId = "navbarTogglerTarget"
 
     function attachSearch(element: HTMLElement) {
 
-        currentAutoComplete = autocomplete({
+        autocomplete({
             container: element,
             placeholder: "Rechercher une fiche",
             openOnFocus: true,
