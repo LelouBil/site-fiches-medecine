@@ -9,7 +9,7 @@ const client = algoliasearch(ALGOLIA_APP_ID, getSecret('ALGOLIA_API_KEY')!);
 
 export async function buildPagesIndex(data: AllCours) {
 
-
+    console.log("Index name: ", pagesIndexName)
     await client.clearRules({
         indexName: pagesIndexName
     })
