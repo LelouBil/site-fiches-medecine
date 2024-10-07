@@ -3,7 +3,7 @@ import "./bootstrap.min.css";
 import {Breadcrumb, Navbar} from "astro-bootstrap";
 import type {NavbarItemType} from 'astro-bootstrap';
 import {arborescence_cours} from "../lib/files";
-// import {ViewTransitions} from "astro:transitions"
+import {ViewTransitions} from "astro:transitions"
 
 interface Props {
     title: string;
@@ -13,8 +13,16 @@ const {title} = Astro.props;
 
 const items: NavbarItemType[] = [
     // pull this in from a config file
-    {text: 'Accueil', href: import.meta.env.BASE_URL, linkClass: Astro.url.pathname == import.meta.env.BASE_URL + "/" ? "active": "" },
-    {text: 'Fiches', href: import.meta.env.BASE_URL + "/ues", linkClass: Astro.url.pathname.startsWith(import.meta.env.BASE_URL + "/ues") ? "active" : ""},
+    {
+        text: 'Accueil',
+        href: import.meta.env.BASE_URL,
+        linkClass: Astro.url.pathname == import.meta.env.BASE_URL + "/" ? "active" : ""
+    },
+    {
+        text: 'Fiches',
+        href: import.meta.env.BASE_URL + "/ues",
+        linkClass: Astro.url.pathname.startsWith(import.meta.env.BASE_URL + "/ues") ? "active" : ""
+    },
     {text: 'QCMs', href: import.meta.env.BASE_URL + "/qcms"},
 ];
 
@@ -50,6 +58,7 @@ if (path.length >= 1) {
         console.log("Todo breadcrumbs")
     }
 }
+const navBarId = "navbarTogglerTarget"
 ---
 
 <!doctype html>
@@ -61,20 +70,24 @@ if (path.length >= 1) {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <meta name="generator" content={Astro.generator}/>
     <base href={Astro.url.pathname + "/"}/>
-    <!--<ViewTransitions/>-->
+    <ViewTransitions/>
     <title>{title}</title>
 </head>
 <body>
 <header class="pt-0 px-0 ">
-    <Navbar class="navbar-expand-lg bg-primary mb-4" data-bs-theme="dark">
-        <div class="container-fluid ms-5">
-            <a class="navbar-brand" href="#">Fiches medecine lol</a>
-            <Navbar.Items {items} class="me-auto mb-2 mb-lg-0"/>
-        </div>
-        <div id="searchbox" class="form-inline mb-lg-0 w-25 d-flex gap-3 me-5">
-        </div>
+    <Navbar class="navbar navbar-expand-lg bg-primary mb-4 " data-bs-theme="dark">
+        <Navbar.Toggler controls={navBarId}/>
+        <Navbar.Collapse id={navBarId}>
+            <div class="container-fluid ms-5 navbar-nav">
+                <a class="navbar-brand" href="#">Fiches medecine lol</a>
+                <Navbar.Items items={items} class="me-auto mb-2 mb-lg-0"/>
+            </div>
+            <div id="searchbox" transition:animate="none" transition:name="search"
+                 class="form-inline mb-lg-0 w-75 d-flex ms-auto me-5">
+            </div>
+        </Navbar.Collapse>
     </Navbar>
-    <div class="ms-5 mb-4">
+    <div class="ms-5 mb-4 form-inline">
         <Breadcrumb>
             {breadcrumbs.map(breadcrumb => (
                     <Breadcrumb.Item><a href={breadcrumb.url}>{breadcrumb.name}</a></Breadcrumb.Item>
@@ -87,14 +100,14 @@ if (path.length >= 1) {
 </main>
 </body>
 </html>
-<style is:global>
-    .aa-Autocomplete {
-        width: 100% !important;
-    }
-</style>
+
 <script>
+    import "bootstrap/dist/js/bootstrap.bundle.js"
+
+</script>
+<script >
     import {liteClient as algoliaSearch} from 'algoliasearch/lite';
-    import {autocomplete, getAlgoliaResults} from '@algolia/autocomplete-js';
+    import {autocomplete,  getAlgoliaResults} from '@algolia/autocomplete-js';
     import type {AutocompleteSource} from '@algolia/autocomplete-js';
     import '@algolia/autocomplete-theme-classic';
     import {ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY} from "astro:env/client";
@@ -105,10 +118,19 @@ if (path.length >= 1) {
         ALGOLIA_APP_ID,
         ALGOLIA_SEARCH_KEY,
     )
+    let currentAutoComplete: any = null
 
+    document.addEventListener("astro:after-swap", () => {
+        // currentAutoComplete.destroy()
+        // currentAutoComplete.refresh()
+        attachSearch(document.getElementById("searchbox")!)
+    })
+    attachSearch(document.getElementById("searchbox")!)
 
-    autocomplete({
-            container: "#searchbox",
+    function attachSearch(element: HTMLElement) {
+
+        currentAutoComplete = autocomplete({
+            container: element,
             placeholder: "Rechercher une fiche",
             openOnFocus: true,
             // plugins: [redirectUrlPlugin],
@@ -139,7 +161,7 @@ if (path.length >= 1) {
                     templates: {
                         item({item, components, html}) {
                             return html`
-                                <a class="aa-ItemLink d-block" href=${import.meta.env.BASE_URL +  item.url}>
+                                <a class="aa-ItemLink d-block" href=${import.meta.env.BASE_URL + item.url}>
                                     <div class="aa-ItemWrapper">
                                         <div class="aa-ItemContent">
                                             <div class="aa-ItemContentBody">
@@ -168,6 +190,17 @@ if (path.length >= 1) {
                     newVar,
                 ];
             }
-        }
-    );
+        });
+    }
+
+
 </script>
+<style is:global>
+    .aa-Autocomplete {
+        width: 100% !important;
+    }
+
+    .aa-ItemContentTitle {
+        font-size: 1rem;
+    }
+</style>
