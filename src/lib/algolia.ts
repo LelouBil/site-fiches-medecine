@@ -46,7 +46,7 @@ export async function buildPagesIndex(data: AllCours) {
                 {
                     objectID: theme.id,
                     name: theme.name,
-                    type: "Theme",
+                    type: "Thème",
                     url: `/ues/${ue.id}/${theme.id}`,
                     parentId: ue.id,
                     parentName: ue.name
