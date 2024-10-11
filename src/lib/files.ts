@@ -50,9 +50,7 @@ export const arborescence_cours: AllCours = await get_arborescence_cours()
 
 export const all_questions: FullQuestion[] = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => theme.cours.flatMap(cours => cours.questions_qcm )))
 
-export const all_ue = arborescence_cours.map(ue => ue.id)
-export const all_themes = arborescence_cours.flatMap(ue => ue.themes.map(theme => theme.id))
-export const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => theme.cours.map(cours => cours.id)))
+
 export const all_tags = [... new Set(all_questions.flatMap(question => question.tags))]
 export const all_difficulty = [... new Set(all_questions.map(question => question.difficulty))]
 export const all_types = [... new Set(all_questions.map(question => question.type))]
@@ -71,7 +69,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
                     const coursFolders = await drive.files_in_folder(dossier_theme.id!, drive.FilterType.Folders);
                     if (coursFolders) {
                         for (const dossier_cours of coursFolders) {
-                            const fiches = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
+                            const fiches: Fiche[] = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
                                 ?.filter(file => file.fileExtension == "pdf")
                                 .map(fiche => ({
                                     id: normalizeName(fiche.name),
@@ -93,28 +91,34 @@ async function get_arborescence_cours(): Promise<AllCours> {
                                 theme_id: normalizeName(dossier_theme.name),
                                 cours_id: normalizeName(dossier_cours.name)
                             }));
-                            cours.push({
-                                name: dossier_cours.name,
-                                id: normalizeName(dossier_cours.name),
-                                fiches: fiches!,
-                                questions_qcm: questions
-                            });
+                            if (questions_qcm || fiches.length > 0) {
+                                cours.push({
+                                    name: dossier_cours.name,
+                                    id: normalizeName(dossier_cours.name),
+                                    fiches: fiches,
+                                    questions_qcm: questions
+                                });
+                            }
                         }
                     }
                     cours.sort((a, b) => a.name.localeCompare(b.name));
-                    themes.push({
-                        name: dossier_theme.name,
-                        id: normalizeName(dossier_theme.name),
-                        cours: cours
-                    });
+                    if (cours.length > 0) {
+                        themes.push({
+                            name: dossier_theme.name,
+                            id: normalizeName(dossier_theme.name),
+                            cours: cours
+                        });
+                    }
                 }
             }
             themes.sort((a, b) => a.name.localeCompare(b.name));
-            ues.push({
-                name: dossier_ue.name,
-                id: normalizeName(dossier_ue.name),
-                themes: themes
-            });
+            if(themes.length > 0) {
+                ues.push({
+                    name: dossier_ue.name,
+                    id: normalizeName(dossier_ue.name),
+                    themes: themes
+                });
+            }
         }
     }
     ues.sort((a, b) => a.name.localeCompare(b.name));

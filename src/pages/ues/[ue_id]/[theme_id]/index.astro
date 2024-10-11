@@ -29,6 +29,6 @@ const theme = ue.themes.find(theme => theme.id === theme_id)!;
     </Fragment>
 
     <Fragment slot="after-elements">
-        <QCMWrapper preSetFilters={{...defaultFilters, included_ue: [ue.id], included_themes: [theme.id]}}/>
+        <QCMWrapper preSetFilters={{...defaultFilters, included_cours: theme.cours.map(c => c.id)}}/>
     </Fragment>
 </ListPage>

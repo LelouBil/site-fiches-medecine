@@ -24,7 +24,10 @@ const ue = arborescence_cours.find(ue => ue.id === ue_id)!;
         ))}
     </Fragment>
     <Fragment slot="after-elements">
-       <QCMWrapper preSetFilters={{...defaultFilters, included_ue: [ue.id]}}/>
+        <QCMWrapper preSetFilters={{
+            ...defaultFilters,
+            included_cours: ue.themes.flatMap(theme => theme.cours).map(cours => cours.id)
+        }}/>
     </Fragment>
 
 
