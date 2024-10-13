@@ -32,6 +32,7 @@
     "astro": "^4.15.10",
     "astro-bootstrap": "^0.7.0",
     "bootstrap": "^5.3.3",
+    "es-iterator-helpers": "^1.1.0",
     "google-auth-library": "^9.14.1",
     "googleapis": "^144.0.0",
     "instantsearch.js": "^4.74.2",
