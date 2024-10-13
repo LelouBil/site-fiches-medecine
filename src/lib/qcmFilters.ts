@@ -1,5 +1,5 @@
 import type {Difficulty, QuestionTag, QuestionType} from "@/lib/questionSchema.ts";
-import {all_difficulty, all_tags, all_types, arborescence_cours, type CoursId} from "@/lib/files.ts";
+import {all_difficulty,  all_types, arborescence_cours, type CoursId} from "@/lib/files.ts";
 
 
 export const defaultFilters : QcmFilters = {
