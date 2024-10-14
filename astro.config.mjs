@@ -8,7 +8,7 @@ import icon from "astro-icon";
 // https://astro.build/config
 export default defineConfig({
   site: "https://leloubil.github.com",
-  base: 'medecine_fiches',
+  base: 'site-fiches-medecine',
   trailingSlash: 'never',
 
   experimental: {
