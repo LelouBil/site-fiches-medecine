@@ -192,6 +192,19 @@ const navBarId = "navbarTogglerTarget";
 </script>
 <style is:global>
 
+    :root {
+        --aa-text-color-rgb: var(--bs-primary-rgb) !important;
+        --aa-primary-color-rgb: var(--bs-primary-rgb) !important;
+        --aa-muted-color-rgb: var(--bs-secondary) !important;
+        //--aa-text-color-alpha: calc(var(--bs-primary) << 6);
+    }
+
+    .aa-ItemWrapper mark {
+        margin: 0;
+        padding: 0 !important;
+    }
+
+
     input, .form-check-input {
         border: 1pt solid black;
     }
@@ -199,6 +212,17 @@ const navBarId = "navbarTogglerTarget";
     .aa-Autocomplete {
         width: 100% !important;
     }
+
+
+    //
+    //.aa-Form {
+    //    border-color: var(--bs-secondary-bg) !important;
+    //    //box-shadow: var(--bs-primary) ;
+    //}
+    //
+    //.aa-SubmitIcon {
+    //color: var(--bs-primary) !important;
+    //}
 
     .aa-ItemContentTitle {
         font-size: 1rem;

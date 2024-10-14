@@ -110,6 +110,11 @@
         questions = filterQuestions(all_questions, question_filters)
             .sort(() => Math.random() - 0.5)
             .slice(0, questions_count);
+        for (const q of questions) {
+            if (q.type == "choices" && q.randomizeOrder) {
+                q.options = new Set(q.options.values().toArray().sort(() => Math.random() - 0.5));
+            }
+        }
         qcm_running = true;
         if (!prefiltered_qcm) {
             console.log("here");
