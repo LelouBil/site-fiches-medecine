@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type { FullQuestion } from "@/lib/files.ts";
-
+    import type {FullQuestion} from "@/lib/files.ts";
+    import { Icon } from 'astro-icon/components';
     type OptionAnswer = number & { __brand: "OptionAnswer" };
     type TextAnswer = string & { __brand: "TextAnswer" };
     type Answer = OptionAnswer[] | TextAnswer;
@@ -101,7 +101,8 @@
                 Vous allez perdre vos réponses actuelles
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" on:click={quitQCM} type="button">Quitter</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" on:click={quitQCM} type="button">Quitter
+                </button>
                 <button class="btn btn-primary" data-bs-dismiss="modal" type="button">Annuler</button>
             </div>
         </div>
@@ -119,7 +120,9 @@
                 Vous allez voir votre score et la correction, sans possibilité de changer vos réponses
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline-success" data-bs-dismiss="modal" on:click={nextQuestion} type="button">Valider</button>
+                <button class="btn btn-outline-success" data-bs-dismiss="modal" on:click={nextQuestion} type="button">
+                    Valider
+                </button>
                 <button class="btn btn-primary" data-bs-dismiss="modal" type="button">Annuler</button>
             </div>
         </div>
@@ -131,15 +134,18 @@
         {#if questions[current_question]}
             <div class="d-flex col align-items-center gap-3">
                 <div>
-                    <p class="fw-bold fs-5 text-secondary my-0">Question <span class="text-info">{current_question + 1}</span> sur {questions.length}
+                    <p class="fw-bold fs-5 text-secondary my-0">Question <span
+                            class="text-info">{current_question + 1}</span> sur {questions.length}
                     </p>
                 </div>
-                <div class="progress flex-fill border-primary border-1 border" role="progressbar" aria-label="avancée dans les questions"
+                <div class="progress flex-fill border-primary border-1 border" role="progressbar"
+                     aria-label="avancée dans les questions"
                      aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}>
                     <div class="progress-bar" style="width: {progressPercent}%"/>
                 </div>
                 <div>
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM</button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM
+                    </button>
                 </div>
             </div>
             <p class=" text-primary-emphasis fs-2 fw-bold mt-4 mb-2">{questions[current_question].text}</p>
@@ -149,25 +155,26 @@
                     {#each questions[current_question].options as option, index}
                         <div class="form-check my-3">
                             <input
-                                type="checkbox"
-                                class=form-check-input
-                                id="option-{index}"
-                                name="question-{current_question}"
-                                value={index}
-                                checked={answers[current_question]?.includes(index)}
-                                on:change={(e) => handleOptionChange(index, e)}
+                                    type="checkbox"
+                                    class=form-check-input
+                                    id="option-{index}"
+                                    name="question-{current_question}"
+                                    value={index}
+                                    checked={answers[current_question]?.includes(index)}
+                                    on:change={(e) => handleOptionChange(index, e)}
                             />
-                            <label for="option-{index}" class="form-check-label text-primary-emphasis">{option.text}</label>
+                            <label for="option-{index}"
+                                   class="form-check-label text-primary-emphasis">{option.text}</label>
                         </div>
                     {/each}
                 </fieldset>
             {:else if questions[current_question].type === 'text'}
                 <input
-                    class="form-control border border-1 border-primary"
-                    type="text"
-                    value={answers[current_question]}
-                    on:input={handleTextChange}
-                    placeholder="Votre réponse"
+                        class="form-control border border-1 border-primary"
+                        type="text"
+                        value={answers[current_question]}
+                        on:input={handleTextChange}
+                        placeholder="Votre réponse"
                 />
             {/if}
         {:else}
@@ -180,13 +187,14 @@
                             {@const correct = answer.correct}
                             {@const checked = answers[index].includes(i)}
                             <div><label
-                                class:text-success={checked && correct}
-                                class:text-danger={checked && !correct}
-                                class:text-warning={!checked && correct}
-                                class:text-secondary={!checked && !correct}
+                                    class:text-success={checked && correct}
+                                    class:text-danger={checked && !correct}
+                                    class:text-warning={!checked && correct}
+                                    class:text-secondary={!checked && !correct}
                             >
                                 <input type="checkbox" disabled checked={answers[index].includes(i)}>
                                 <span>
+                                    <Icon name="icon-park-solid:correct"/>
                                     {answer.text}
                                 </span>
                             </label></div>
@@ -202,10 +210,14 @@
     <hr class="my-4"/>
     <div class="mt-5 d-flex col btn-holder">
         {#if current_question < questions.length}
-            <button class="btn btn-outline-primary" on:click={previousQuestion} disabled={current_question === 0}>Précédent</button>
+            <button class="btn btn-outline-primary" on:click={previousQuestion} disabled={current_question === 0}>
+                Précédent
+            </button>
             {#if current_question === questions.length - 1}
 
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitConfirm">Valider les réponses</button>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitConfirm">Valider les
+                    réponses
+                </button>
             {:else}
 
                 <button class="btn btn-primary" on:click={nextQuestion}>Suivant</button>

@@ -3,6 +3,10 @@ import "./bootstrap.min.css";
 import { Breadcrumb, Navbar } from "astro-bootstrap";
 import type { NavbarItemType } from "astro-bootstrap";
 import { arborescence_cours } from "../lib/files";
+import {Image} from "astro:assets"
+import faviconSrc from './favicon.png'
+
+import logoSrc from './logo.png'
 // import {ViewTransitions} from "astro:transitions"
 
 interface Props {
@@ -59,6 +63,8 @@ if (path.length >= 1) {
     }
 }
 const navBarId = "navbarTogglerTarget";
+
+
 ---
 
 <!doctype html>
@@ -67,19 +73,21 @@ const navBarId = "navbarTogglerTarget";
     <meta charset="UTF-8"/>
     <meta name="description" content="Fiches de cours de médecine"/>
     <meta name="viewport" content="width=device-width"/>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <link rel="icon" type="image/png" href={faviconSrc.src}/>
     <meta name="generator" content={Astro.generator}/>
     <base href={Astro.url.pathname + "/"}/>
     <!--<ViewTransitions/>-->
     <title>{title}</title>
 </head>
 <body>
-<header class="pt-0 px-0 ">
-    <Navbar class="navbar navbar-expand-lg bg-primary mb-4 " data-bs-theme="dark">
+<header class="pt-0 px-0">
+    <Navbar class="navbar navbar-expand-lg bg-primary mb-3" data-bs-theme="dark">
         <Navbar.Toggler controls={navBarId}/>
         <Navbar.Collapse id={navBarId}>
-            <div class="container-fluid ms-5 navbar-nav">
-                <a class="navbar-brand" href="#">Fiches medecine lol</a>
+            <div class="container-fluid ms-5 navbar-nav align-items-center ">
+                <a class="navbar-brand" href={import.meta.env.BASE_URL}>
+                    <Image src={logoSrc} alt="logo" height="90" />
+                </a>
                 <Navbar.Items items={items} class="me-auto mb-2 mb-lg-0"/>
             </div>
             <div id="searchbox" transition:animate="none" transition:name="search"
