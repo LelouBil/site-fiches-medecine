@@ -1,6 +1,7 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import type {FullQuestion} from "@/lib/files.ts";
+
     type OptionAnswer = number & { __brand: "OptionAnswer" };
     type TextAnswer = string & { __brand: "TextAnswer" };
     type Answer = OptionAnswer[] | TextAnswer;
@@ -42,11 +43,13 @@
                 }
             }
             answers = newTab;
+
         }
         const current = localStorage.getItem("current_question");
         if (current) {
             current_question = JSON.parse(current);
         }
+        console.log("current question here", current)
         saveStorage();
     }
 
@@ -74,20 +77,63 @@
 
     function nextQuestion() {
         current_question++;
+        saveStorage()
     }
 
     function previousQuestion() {
         current_question--;
-    }
-
-    $: {
-        if (save_answers)
-            localStorage.setItem("current_question", JSON.stringify(current_question));
+        saveStorage()
     }
 
     onMount(() => {
         loadStorage();
     });
+
+    let points: number[] = []
+
+    $: {
+        for (let [i, answer] of answers.entries()) {
+            const question = questions[i]!
+            const answered_options = answer as OptionAnswer[]
+            let pts = 0;
+            if (question.type === "choices") {
+                let fautes = 0
+                for (let [opti, opt] of question.options.entries()) {
+                    let checked = answered_options.includes(opti as OptionAnswer);
+                    if (opt.correct && !checked || (!opt.correct && checked)) {
+                        fautes++;
+                    }
+                }
+                switch (fautes) {
+                    case 0:
+                        pts = 1;
+                        break
+                    case 1:
+                        pts = 0.5;
+                        break
+                    case 2:
+                        pts = 0.2;
+                        break
+                    default:
+                        pts = 0;
+                        break
+                }
+            }else if (question.type === "text"){
+                if(getMatches(answer as TextAnswer,question.answers)){
+                    pts = 1
+                }else{
+                    pts = 0
+                }
+                //todo QCS
+            }
+            points[i] = pts
+        }
+    }
+
+
+    function getMatches(source: TextAnswer, possibilities: string[]) {
+        return possibilities.filter(p => p.toUpperCase() == source.toUpperCase()) || null
+    }
 
     $: isAnswerChosen = answers[current_question] && answers[current_question] !== "";
 </script>
@@ -103,7 +149,7 @@
                 Vous allez perdre vos réponses actuelles
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" on:click={quitQCM} type="button">Quitter
+                <button class="btn btn-outline-primary" data-bs-dismiss="modal" on:click={quitQCM} type="button">Quitter
                 </button>
                 <button class="btn btn-primary" data-bs-dismiss="modal" type="button">Annuler</button>
             </div>
@@ -180,37 +226,81 @@
                 />
             {/if}
         {:else}
+            <h2 class="my-2">Résultats</h2>
+            <h1 class="my-2">Note: {points.reduce((a,b) => a + b)}/{questions.length}</h1>
+            <hr class="my-3"/>
             {#each questions as question, index}
                 <div class="question-result">
-                    <p class="fw-bold question-text">{index + 1}. {question.text}</p>
+                    <p class="text-primary-emphasis fs-3 fw-bold question-text">{index + 1}. {question.text}</p>
                     {#if question.type === 'choices'}
-                        <!--<span>Score&thinsp;: {corrects.filter((a, i) => a.id === i).length} / {corrects.length}</span>-->
+                        {@const qt_pts = points[index] || 0}
+
+                        <span
+                                class="fw-bolder fs-4"
+                            class:text-success={qt_pts === 1}
+                            class:text-warning={qt_pts > 0 && qt_pts < 1}
+                            class:text-danger={qt_pts === 0}
+                        >Points&thinsp;: {qt_pts}</span>
                         {#each question.options.values() as answer, i}
                             {@const correct = answer.correct}
                             {@const checked = answers[index].includes(i)}
-                            <div><label
-                                    class:text-success={checked && correct}
-                                    class:text-danger={checked && !correct}
-                                    class:text-warning={!checked && correct}
-                                    class:text-secondary={!checked && !correct}
-                            >
-                                <input type="checkbox" disabled checked={answers[index].includes(i)}>
-                                <span>
-<!--                                    <Icon name="icon-park-solid:correct"/>-->
+                            <div class="form-check my-3">
+                                <input class="form-check-input " type="checkbox" id="option-{i}"
+                                       checked={answers[index].includes(i)}
+                                       inert
+                                       class:bg-success={checked && correct}
+                                       class:bg-danger={checked && !correct}
+                                       class:bg-warning={!checked && correct}
+                                       class:bg-secondary={!checked && !correct}
+
+                                >
+                                <label
+
+                                        class:text-success={checked && correct}
+                                        class:text-danger={checked && !correct}
+                                        class:text-warning={!checked && correct}
+                                        class:text-secondary={!checked && !correct}
+
+                                        class="form-check-label fw-bold" style="pointer-events: none"
+                                        for="option-{i}"
+                                >
+                                    <span class="font-monospace fw-bolder fs-5">{correct ? "[Vrai]" : "[Faux]"}</span>
                                     {answer.text}
-                                </span>
-                            </label></div>
+                                </label></div>
                         {/each}
                     {:else if question.type === 'text'}
-                        {question.answers}
+                        {@const matches = getMatches(answers[index], question.answers)}
+                        <input
+                                disabled
+                                class="form-control border border-1 my-2"
+                                class:border-success={matches.length > 0}
+                                class:border-danger={matches.length === 0}
+                                type="text"
+                                value={answers[index]}
+                        />
+                        {#if matches.length > 0}
+                            <div>
+                                Correct: <span class="text-primary-emphasis fw-bolder">{matches[0]}</span>
+                            </div>
+                        {/if}
+
+                        <ul class="list-group my-2">
+                            <li class="list-group-item border-primary-subtle fw-bold fs-5 text-primary-emphasis">
+                                Réponses valides
+                            </li>
+                            {#each question.answers as answer}
+                                <li class="list-group-item border-primary-subtle list-group-item-secondary"
+                                    class:list-group-item-success={matches.includes(answer)}
+                                >{answer}</li>
+                            {/each}
+                        </ul>
                     {/if}
                 </div>
             {/each}
-            <pre>{JSON.stringify(answers, null, 2)}</pre>
         {/if}
     </div>
     <hr class="my-4"/>
-    <div class="mt-5 d-flex col btn-holder">
+    <div class="my-5 d-flex col btn-holder">
         {#if current_question < questions.length}
             <button class="btn btn-outline-primary" on:click={previousQuestion} disabled={current_question === 0}>
                 Précédent

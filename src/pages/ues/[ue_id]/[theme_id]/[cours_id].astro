@@ -40,7 +40,9 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
             </div>
     ))}
 
-    <QCMWrapper preSetFilters={{...defaultFilters,included_cours: new Set([cours.id])}}/>
+    <QCMWrapper preSetFilters={{...defaultFilters,
+        context: `le cours`,
+        included_cours: new Set([cours.id])}}/>
 
     <div id="questions" class="mt-5">
         <!-- Future questions will be added here -->

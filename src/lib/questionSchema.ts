@@ -32,9 +32,9 @@ let optionArray = z.array(questionOption);
 export const qcmQuestion = questionBase.merge(z.object({
     type: z.literal("choices").describe("Le type de question"),
     randomizeOrder: z.boolean().default(true).describe("Les propositions sont-elles dans un ordre aléatoire ?"),
-    options: uniqueArraySet<typeof questionOption,typeof optionArray>(optionArray
+    options: optionArray
             .min(2)
-    )
+
         .refine(data => [...data].some(option => option.correct), {
             message: "Il doit y avoir au moins une proposition correcte"
         })

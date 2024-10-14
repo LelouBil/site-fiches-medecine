@@ -20,6 +20,9 @@ importers:
       '@algolia/autocomplete-plugin-redirect-url':
         specifier: ^1.17.4
         version: 1.17.4(@algolia/client-search@5.7.0)(algoliasearch@5.7.0)(search-insights@2.17.2)
+      '@algolia/autocomplete-preset-algolia':
+        specifier: ^1.17.4
+        version: 1.17.4(@algolia/client-search@5.7.0)(algoliasearch@5.7.0)
       '@algolia/autocomplete-theme-classic':
         specifier: ^1.17.4
         version: 1.17.4
@@ -68,6 +71,9 @@ importers:
       instantsearch.js:
         specifier: ^4.74.2
         version: 4.74.2(algoliasearch@5.7.0)
+      sharp:
+        specifier: ^0.33.5
+        version: 0.33.5
       svelte:
         specifier: ^4.2.19
         version: 4.2.19
@@ -4367,13 +4373,11 @@ snapshots:
     dependencies:
       color-name: 1.1.4
       simple-swizzle: 0.2.2
-    optional: true
 
   color@4.2.3:
     dependencies:
       color-convert: 2.0.1
       color-string: 1.9.1
-    optional: true
 
   combined-stream@1.0.8:
     dependencies:
@@ -4490,8 +4494,7 @@ snapshots:
 
   dequal@2.0.3: {}
 
-  detect-libc@2.0.3:
-    optional: true
+  detect-libc@2.0.3: {}
 
   deterministic-object-hash@2.0.2:
     dependencies:
@@ -5099,8 +5102,7 @@ snapshots:
       call-bind: 1.0.7
       get-intrinsic: 1.2.4
 
-  is-arrayish@0.3.2:
-    optional: true
+  is-arrayish@0.3.2: {}
 
   is-async-function@2.0.0:
     dependencies:
@@ -6136,7 +6138,6 @@ snapshots:
       '@img/sharp-wasm32': 0.33.5
       '@img/sharp-win32-ia32': 0.33.5
       '@img/sharp-win32-x64': 0.33.5
-    optional: true
 
   shiki@1.22.0:
     dependencies:
@@ -6159,7 +6160,6 @@ snapshots:
   simple-swizzle@0.2.2:
     dependencies:
       is-arrayish: 0.3.2
-    optional: true
 
   sisteransi@1.0.5: {}
 

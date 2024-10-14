@@ -6,7 +6,7 @@
     import type {AllCours, CoursId, FullQuestion} from "@/lib/files.ts";
     import type {Difficulty, QuestionTag, QuestionType} from "@/lib/questionSchema.ts";
 
-    import type {QcmFilters} from "@/lib/qcmFilters.ts";
+    import type {QcmFilters, PreSetFilters} from "@/lib/qcmFilters.ts";
 
     import "es-iterator-helpers/auto";
     import TagsFilter from "@/components/TagsFilter.svelte";
@@ -19,12 +19,14 @@
     export let all_tags: Set<QuestionTag>;
     export let all_types: Set<QuestionType>;
     export let arborescence_cours: AllCours;
-    export let preSetFilters: QcmFilters | null = null;
+    export let preSetFilters: PreSetFilters | null = null;
     export let defaultFilters: QcmFilters;
+
 
     const question_filters: QcmFilters = preSetFilters ?? defaultFilters;
 
     const prefiltered_qcm = preSetFilters != null;
+
 
 
     enum SelectionStatus {
@@ -116,7 +118,7 @@
             .slice(0, questions_count);
         for (const q of questions) {
             if (q.type == "choices" && q.randomizeOrder) {
-                q.options = new Set(q.options.values().toArray().sort(() => Math.random() - 0.5));
+                q.options = q.options.values().toArray().sort(() => Math.random() - 0.5);
             }
         }
         qcm_running = true;
@@ -135,13 +137,22 @@
 
     let questions: FullQuestion[] = [];
 
+    const difficultyMap: { [diff: Difficulty]: string } = {
+        "easy": "Facile",
+        "medium": "Moyen",
+        "hard": "Difficile",
+        "impossible": "Antagoniste"
+    }
+
+    const typeMap: { [type: QuestionType]: string } = {
+        "choices": "QCM",
+        "text": "Texte libre"
+    }
+
     let mounted = false;
 
     onMount(() => {
-
-        if (prefiltered_qcm) {
-            prepareQCM();
-        } else {
+        if (!prefiltered_qcm) {
 
             const localQuestions = localStorage.getItem("questions");
             if (localQuestions != null) {
@@ -154,13 +165,24 @@
             }
         }
         mounted = true
+        if (prefiltered_qcm && questions_count_preview == 0) {
+            mounted = false
+        }
+
     });
 
 
 </script>
+
+{#if prefiltered_qcm && !qcm_running}
+    <div class=" my-2">
+        <button class="d-block btn btn-primary w-50 m-auto mx-auto" on:click={prepareQCM}>Se tester avec {questions_count} questions sur {preSetFilters.context}</button>
+    </div>
+{/if}
 {#if mounted}
 
-    {#if !qcm_running}
+
+    {#if (!qcm_running && !prefiltered_qcm)}
         <h2>Configuration du QCM</h2>
 
         <div class="row g-3 align-items-center my-2">
@@ -168,7 +190,8 @@
                 <label for="nombre_questions" class="form-label fs-4 fw-bold">Nombre de questions souhaitées</label>
             </div>
             <div class="col-auto">
-                <input type="number" name="nombre_questions" class="form-control" aria-describedby="nombreHelpBlock"
+                <input type="number" name="nombre_questions"
+                       class="form-control border-primary border-1 border fw-bolder" aria-describedby="nombreHelpBlock"
                        bind:value={questions_count} min="1"
                        max={questions_count_preview}/>
             </div>
@@ -179,18 +202,18 @@
         </div>
 
 
-        <div class="hstack my-3 align-items-stretch overflow-x-auto gap-2 fs-4">
+        <div class="hstack my-3 align-items-stretch overflow-x-auto gap-2 fs-4 ">
             <div class="card w-25 scroll-card">
-                <div class="card-header"><h3 class="card-title">Filtrer par tags</h3></div>
+                <div class="card-header"><h3 class="card-title text-center">Filtrer par tags</h3></div>
                 <div class="card-body">
                     <TagsFilter dataset={all_tags} bind:included={question_filters.filtered_tags}
                                 bind:excluded={question_filters.excluded_tags}/>
                 </div>
             </div>
             <div class="card scroll-card">
-                <div class="card-header"><h3 class="card-title">Filtres par difficulté et type</h3></div>
+                <div class="card-header"><h3 class="card-title text-center">Filtres par difficulté et type</h3></div>
                 <div class="card-body">
-                    <div>
+                    <div class="mt-2">
                         <h3>Difficulté</h3>
                         {#each all_difficulty as difficulty}
                             <div class="form-check form-switch">
@@ -204,12 +227,14 @@
                            }
                        }}
                                        checked={question_filters.included_difficulty.has(difficulty)}
-                                ><label for="{difficulty}" class="form-check-label">{difficulty}</label>
+                                ><label for="{difficulty}" class="form-check-label">
+                                {difficultyMap[difficulty]}
+                            </label>
                             </div>
                         {/each}
                     </div>
 
-                    <div>
+                    <div class="my-4">
                         <h3>Type</h3>
                         {#each all_types as type}
                             <div class="form-check form-switch">
@@ -223,7 +248,7 @@
                            }
                        }}
                                        checked={question_filters.included_type.has(type)}
-                                ><label for="{type}" class=form-check-label>{type}</label>
+                                ><label for="{type}" class=form-check-label>{typeMap[type]}</label>
                             </div>
                         {/each}
                     </div>
@@ -231,16 +256,17 @@
             </div>
 
             <div class="card scroll-card">
-                <div class="card-header"><h3 class="card-title d-inline-block">Filtrer par UE/Theme/Cours</h3></div>
+                <div class="card-header"><h3 class="card-title d-inline-block text-center">Filtrer par
+                    UE/Theme/Cours</h3></div>
 
                 {#each arborescence_cours as ue}
-                    <details class="list mx-2" open>
+                    <details class="list mx-3 mt-4" open>
                         <summary> <span class="form-check-inline"><input type="checkbox" class=form-check-input
                                                                          on:change={(e) =>  setUE(ue.id,e.target?.checked)}
                                                                          checked={ue_state_map[ue.id] === SelectionStatus.SELECTED || ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
                                                                          indeterminate={ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
                                                                          name={ue.id} id={ue.id}>
-                        <label for="{ue.id}" class="form-check-label">{ue.name}</label></span></summary>
+                        <label for="{ue.id}" class="form-check-label">UE&nbsp;: {ue.name}</label></span></summary>
                         {#each ue.themes as theme}
                             <details>
                                 <summary><span class="form-check-inline"><input type="checkbox" class="form-check-input"
@@ -249,7 +275,7 @@
                                                                                 checked={theme_state_map[theme.id] === SelectionStatus.SELECTED || theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
                                                                                 indeterminate={theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
                                                                                 id={theme.id}><label for="{theme.id}"
-                                                                                                     class="form-check-label">{theme.name}</label>
+                                                                                                     class="form-check-label">Thème&nbsp;: {theme.name}</label>
                             </span>
                                 </summary>
                                 {#each theme.cours as cours}
@@ -277,7 +303,8 @@
                 on:click={prepareQCM}>
             {(questions_count_preview === 0) ? "Aucune question ne correspond au filtres" : (questions_count === 0 ? "Il faut choisir au moins une question" : `Démarrer ${questions_count} questions`)}
         </button>
-    {:else}
+    {/if}
+    {#if qcm_running}
         {#if questions.length === 0}
             <p>Aucune question ne correspond aux filtres</p>
         {:else}

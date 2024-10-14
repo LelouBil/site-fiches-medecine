@@ -5,6 +5,7 @@ import type { NavbarItemType } from "astro-bootstrap";
 import { arborescence_cours } from "../lib/files";
 import {Image} from "astro:assets"
 import faviconSrc from './favicon.png'
+import AlgoliaSearch from "../components/AlgoliaSearch.svelte"
 
 import logoSrc from './logo.png'
 // import {ViewTransitions} from "astro:transitions"
@@ -86,12 +87,17 @@ const navBarId = "navbarTogglerTarget";
         <Navbar.Collapse id={navBarId}>
             <div class="container-fluid ms-5 navbar-nav align-items-center ">
                 <a class="navbar-brand" href={import.meta.env.BASE_URL}>
-                    <Image src={logoSrc} alt="logo" height="90" />
+                    <Image loading="eager" src={logoSrc} alt="logo" height="90" />
                 </a>
                 <Navbar.Items items={items} class="me-auto mb-2 mb-lg-0"/>
             </div>
-            <div id="searchbox" transition:animate="none" transition:name="search"
+            <div id="searchbox"
                  class="form-inline mb-lg-0 w-75 d-flex ms-auto me-5">
+                <AlgoliaSearch idToDelete="algoliaPlaceHolder" client:only="svelte">
+                    <div  id="algoliaPlaceHolder" class="placeholder-glow w-100 h-100" slot="fallback">
+                        <div class="placeholder w-100 h-100">&nbsp;</div>
+                    </div>
+                </AlgoliaSearch>
             </div>
         </Navbar.Collapse>
     </Navbar>
@@ -111,128 +117,13 @@ const navBarId = "navbarTogglerTarget";
 <script>
 
     import "bootstrap/dist/js/bootstrap.bundle";
-    import { liteClient as algoliaSearch } from "algoliasearch/lite";
-    import { autocomplete, getAlgoliaResults } from "@algolia/autocomplete-js";
-    import type { AutocompleteSource } from "@algolia/autocomplete-js";
-    import "@algolia/autocomplete-theme-classic";
-    import { ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY } from "astro:env/client";
-    import { pagesIndexName } from "../lib/pagesIndexName";
-
-    const searchClient = algoliaSearch(
-        ALGOLIA_APP_ID,
-        ALGOLIA_SEARCH_KEY
-    );
-
-    // document.addEventListener("astro:after-swap", () => {
-    //     // currentAutoComplete.destroy()
-    //     // currentAutoComplete.refresh()
-    //     attachSearch(document.getElementById("searchbox")!)
-    // })
-    attachSearch(document.getElementById("searchbox")!);
-
-    function attachSearch(element: HTMLElement) {
-
-        autocomplete({
-            container: element,
-            placeholder: "Rechercher une fiche",
-            openOnFocus: true,
-            // plugins: [redirectUrlPlugin],
-            insights: true,
-            getSources({ query }) {
-                let newVar: AutocompleteSource<any> = {
-                    sourceId: "pages",
-                    getItems() {
-                        return getAlgoliaResults({
-                            searchClient,
-                            queries: [
-                                {
-                                    indexName: pagesIndexName,
-                                    params: {
-                                        query,
-                                        hitsPerPage: 5
-                                    }
-                                }
-                            ]
-                        });
-                    },
-                    getItemUrl({ item }) {
-                        return item.url;
-                    },
-                    getItemInputValue({ item }) {
-                        return item.name;
-                    },
-                    templates: {
-                        item({ item, components, html }) {
-                            return html`
-                                <a class="aa-ItemLink d-block" href=${import.meta.env.BASE_URL + item.url}>
-                                    <div class="aa-ItemWrapper">
-                                        <div class="aa-ItemContent">
-                                            <div class="aa-ItemContentBody">
-                                                <div class="aa-ItemContentTitle">
-                                                    ${components.Highlight({
-                                                        hit: item,
-                                                        attribute: "name"
-                                                    })}
-                                                </div>
-                                                <div class="aa-ItemContentDescription">
-                                                    ${components.Snippet({
-                                                        hit: item,
-                                                        attribute: "type"
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            `;
-                        }
-                    }
-
-                };
-                return [
-                    newVar
-                ];
-            }
-        });
-    }
-
 
 </script>
 <style is:global>
-
-    :root {
-        --aa-text-color-rgb: var(--bs-primary-rgb) !important;
-        --aa-primary-color-rgb: var(--bs-primary-rgb) !important;
-        --aa-muted-color-rgb: var(--bs-secondary) !important;
-        //--aa-text-color-alpha: calc(var(--bs-primary) << 6);
-    }
-
-    .aa-ItemWrapper mark {
-        margin: 0;
-        padding: 0 !important;
-    }
 
 
     input, .form-check-input {
         border: 1pt solid black;
     }
 
-    .aa-Autocomplete {
-        width: 100% !important;
-    }
-
-
-    //
-    //.aa-Form {
-    //    border-color: var(--bs-secondary-bg) !important;
-    //    //box-shadow: var(--bs-primary) ;
-    //}
-    //
-    //.aa-SubmitIcon {
-    //color: var(--bs-primary) !important;
-    //}
-
-    .aa-ItemContentTitle {
-        font-size: 1rem;
-    }
 </style>

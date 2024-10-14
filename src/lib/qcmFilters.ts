@@ -17,3 +17,5 @@ export type QcmFilters = {
     included_difficulty: Set<Difficulty>,
     included_type: Set<QuestionType>,
 }
+
+export type PreSetFilters = QcmFilters & {context: string}

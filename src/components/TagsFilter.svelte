@@ -34,11 +34,11 @@
         };
     }
 
-    $: filteredTags = Array.from(dataset).filter(tag => tag.includes(search) && !included.has(tag) && !excluded.has(tag)).slice(0, 15);
+    $: filteredTags = Array.from(dataset).filter(tag => tag.includes(search) && !included.has(tag) && !excluded.has(tag)).slice(0, 8);
 
 </script>
 
-<div class="my-2">
+<div class="mb-2 mt-0">
     <strong>Tags requis:</strong>
     <div class="d-flex col gap-2 flex-wrap">
         {#each Array.from(included) as tag}

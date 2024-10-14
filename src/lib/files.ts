@@ -64,6 +64,7 @@ export const all_types = new Set(all_questions.map(question => question.type))
 
 
 async function get_arborescence_cours(): Promise<AllCours> {
+    console.log("Reading drive")
     const ues: UE[] = [];
     const ueFolders = await drive.files_in_folder(drive.ROOT_FOLDER_ID, drive.FilterType.Folders);
     if (ueFolders) {
