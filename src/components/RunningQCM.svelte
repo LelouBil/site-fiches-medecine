@@ -1,6 +1,6 @@
 <script lang="ts">
+    import {onMount} from "svelte";
     import type {FullQuestion} from "@/lib/files.ts";
-    import { Icon } from 'astro-icon/components';
     type OptionAnswer = number & { __brand: "OptionAnswer" };
     type TextAnswer = string & { __brand: "TextAnswer" };
     type Answer = OptionAnswer[] | TextAnswer;
@@ -85,7 +85,9 @@
             localStorage.setItem("current_question", JSON.stringify(current_question));
     }
 
-    loadStorage();
+    onMount(() => {
+        loadStorage();
+    });
 
     $: isAnswerChosen = answers[current_question] && answers[current_question] !== "";
 </script>
@@ -194,7 +196,7 @@
                             >
                                 <input type="checkbox" disabled checked={answers[index].includes(i)}>
                                 <span>
-                                    <Icon name="icon-park-solid:correct"/>
+<!--                                    <Icon name="icon-park-solid:correct"/>-->
                                     {answer.text}
                                 </span>
                             </label></div>
