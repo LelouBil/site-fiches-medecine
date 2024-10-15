@@ -94,19 +94,19 @@
     const difficuly_map: {[diff in Difficulty]: {icon: string, color_class: string}} = {
         easy :{
             icon: "line-md:gauge-empty",
-            color_class: "text-secondary-emphasis"
+            color_class: "text-success"
         },
         medium: {
             icon: "line-md:gauge-low",
-            color_class: "text-primary"
+            color_class: "text-warning"
         },
         hard: {
             icon: "line-md:gauge",
-            color_class: "text-warning"
+            color_class: "text-danger"
         },
         impossible: {
-            icon: "line-md:gauge-full",
-            color_class: "text-danger"
+            icon: "line-md:gauge-full-twotone",
+            color_class: "text-primary"
         }
     }
 
