@@ -21,15 +21,18 @@ const items: NavbarItemType[] = [
     // pull this in from a config file
     {
         text: "Accueil",
-        href: import.meta.env.BASE_URL,
-        linkClass: Astro.url.pathname == import.meta.env.BASE_URL + "/" ? "active" : ""
+        href: "/",
+        linkClass: Astro.url.pathname == "/" ? "active" : ""
     },
     {
         text: "Fiches",
-        href: import.meta.env.BASE_URL + "/ues",
-        linkClass: Astro.url.pathname.startsWith(import.meta.env.BASE_URL + "/ues") ? "active" : ""
+        href: "/ues",
+        linkClass: Astro.url.pathname.startsWith("/ues") ? "active" : ""
     },
-    { text: "QCMs", href: import.meta.env.BASE_URL + "/qcms" }
+    {   text: "QCMs",
+        href: "/qcms",
+        linkClass: Astro.url.pathname.startsWith("/qcms") ? "active" : ""
+    }
 ];
 
 const breadcrumbs: { name: string, url: string }[] = [];
@@ -39,23 +42,23 @@ if (path[0] === "") {
     path.shift();
 }
 if (path.length >= 0) {
-    // breadcrumbs.push({name: "Accueil", url: import.meta.env.BASE_URL})
+    // breadcrumbs.push({name: "Accue"})
 }
 console.log(path);
 if (path.length >= 1) {
     if (path[0] === "ues") {
-        breadcrumbs.push({ name: "UEs", url: import.meta.env.BASE_URL + "/ues" });
+        breadcrumbs.push({ name: "UEs", url: "/ues" });
         if (path.length >= 2) {
             let ue = arborescence_cours.find(ue => ue.id === path[1])!;
-            breadcrumbs.push({ name: ue.name, url: import.meta.env.BASE_URL + `/ues/${ue.id}` });
+            breadcrumbs.push({ name: ue.name, url: `/ues/${ue.id}` });
             if (path.length >= 3) {
                 let theme = ue.themes.find(theme => theme.id === path[2])!;
-                breadcrumbs.push({ name: theme.name, url: import.meta.env.BASE_URL + `/ues/${ue.id}/${theme.id}` });
+                breadcrumbs.push({ name: theme.name, url: `/ues/${ue.id}/${theme.id}` });
                 if (path.length >= 4) {
                     let cours = theme.cours.find(cours => cours.id === path[3])!;
                     breadcrumbs.push({
                         name: cours.name,
-                        url: import.meta.env.BASE_URL + `/ues/${ue.id}/${theme.id}/${cours.id}`
+                        url: `/ues/${ue.id}/${theme.id}/${cours.id}`
                     });
                 }
             }
@@ -87,7 +90,7 @@ const navBarId = "navbarTogglerTarget";
         <Navbar.Toggler controls={navBarId}/>
         <Navbar.Collapse id={navBarId}>
             <div class="container-fluid ms-5 navbar-nav align-items-center ">
-                <a class="navbar-brand" href={import.meta.env.BASE_URL}>
+                <a class="navbar-brand" href="/">
                     <Image loading="eager" src={logoSrc} alt="logo" height="100" />
                 </a>
                 <Navbar.Items items={items} class="me-auto mb-2 mb-lg-0"/>
