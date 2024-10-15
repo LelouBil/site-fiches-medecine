@@ -9,6 +9,11 @@ import icon from "astro-icon";
 export default defineConfig({
   site: "https://medhisouk.fr",
   trailingSlash: 'never',
+    vite: {
+      ssr:{
+          noExternal:[/@algolia\/(.*)/]
+      }
+    },
 
   experimental: {
       env: {

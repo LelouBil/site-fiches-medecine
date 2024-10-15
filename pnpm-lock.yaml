@@ -8,7 +8,7 @@ importers:
 
   .:
     dependencies:
-      '@algolia/autocomplete-js':
+      '@algolia/autocomplete-core':
         specifier: ^1.17.4
         version: 1.17.4(@algolia/client-search@5.7.0)(algoliasearch@5.7.0)(search-insights@2.17.2)
       '@algolia/autocomplete-plugin-algolia-insights':
@@ -68,6 +68,9 @@ importers:
       googleapis:
         specifier: ^144.0.0
         version: 144.0.0
+      iconify-icon:
+        specifier: ^2.1.0
+        version: 2.1.0
       instantsearch.js:
         specifier: ^4.74.2
         version: 4.74.2(algoliasearch@5.7.0)
@@ -1736,6 +1739,9 @@ packages:
   https-proxy-agent@7.0.5:
     resolution: {integrity: sha512-1e4Wqeblerz+tMKPIq2EMGiiWW1dIjZOksyHWSUm1rmuvw/how9hBHZ38lAGj5ID4Ik6EdkOw7NmWPy6LAwalw==}
     engines: {node: '>= 14'}
+
+  iconify-icon@2.1.0:
+    resolution: {integrity: sha512-lto4XU3bwTQnb+D/CsJ4dWAo0aDe+uPMxEtxyOodw9l7R9QnJUUab3GCehlw2M8mDHdeUu/ufx8PvRQiJphhXg==}
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
@@ -5058,6 +5064,10 @@ snapshots:
       debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
+
+  iconify-icon@2.1.0:
+    dependencies:
+      '@iconify/types': 2.0.0
 
   iconv-lite@0.6.3:
     dependencies:

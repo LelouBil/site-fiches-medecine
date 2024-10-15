@@ -33,7 +33,7 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
                     <details class="mb-3 justify-content-center text-center align-items-center" style="width: 100%">
                         <summary class="d-inline-block mx-auto">Afficher l'aperçu du PDF</summary>
                             <object data={fiche.embed_url} type="application/pdf" class="pdf-embed">
-                                <p>Impossible d'afficher l'apercu <a href={fiche.download_url}>TéléchargerPDF</a>.</p>
+                                <p>Impossible d'afficher l'apercu <a href={fiche.download_url}>Télécharger le PDF</a>.</p>
                             </object>
                     </details>
                 </div>
@@ -54,12 +54,21 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
 
 <style>
 
-    .pdf-embed {
+    .pdf-embed{
         width: 100%;
         display: block;
         margin: auto;
-
         max-width: 50rem;
-        height: 69.7rem;
     }
+
+    .pdf-embed{
+        height: 30rem;
+    }
+
+    @media screen and (min-width: 768px) {
+        .pdf-embed {
+            height: 69.7rem;
+        }
+    }
+
 </style>

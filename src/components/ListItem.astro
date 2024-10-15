@@ -8,11 +8,12 @@ const { href } = Astro.props;
 ---
 
 <!-- Single list item component with custom styling -->
-<li class="list-group-item p-4 btn btn-outline-primary border-2 border border-primary mb-3 theme-item">
-    <div class="text-decoration-none theme-link">
+<li class="list-item">
+    <a href={href} class="d-block p-4 btn btn-outline-primary theme-item">
+    <div class="theme-link text-color-primary">
         <slot/>
     </div>
-    <a href={href} class="stretched-link"></a>
+    </a>
 </li>
 
 <style>

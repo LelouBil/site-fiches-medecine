@@ -1,11 +1,10 @@
 ---
 import "./bootstrap.min.css";
-import { Breadcrumb, Navbar } from "astro-bootstrap";
-import type { NavbarItemType } from "astro-bootstrap";
-import { arborescence_cours } from "../lib/files";
+import {Breadcrumb, Navbar} from "astro-bootstrap";
+import {arborescence_cours} from "../lib/files";
 import {Image} from "astro:assets"
 import faviconSrc from './favicon.png'
-import AlgoliaSearch from "../components/AlgoliaSearch.svelte"
+import AlgoliaSearch from "../components/AlgoliaSearch.astro"
 
 import logoSrc from './logo.png'
 import githubIcon from './github-mark.svg'
@@ -15,23 +14,24 @@ interface Props {
     title: string;
 }
 
-const { title } = Astro.props;
+const {title} = Astro.props;
 
-const items: NavbarItemType[] = [
+const items = [
     // pull this in from a config file
     {
         text: "Accueil",
         href: "/",
-        linkClass: Astro.url.pathname == "/" ? "active" : ""
+        active: Astro.url.pathname == "/"
     },
     {
         text: "Fiches",
         href: "/ues",
-        linkClass: Astro.url.pathname.startsWith("/ues") ? "active" : ""
+        active: Astro.url.pathname.startsWith("/ues")
     },
-    {   text: "QCMs",
+    {
+        text: "QCMs",
         href: "/qcms",
-        linkClass: Astro.url.pathname.startsWith("/qcms") ? "active" : ""
+        active: Astro.url.pathname.startsWith("/qcms")
     }
 ];
 
@@ -47,13 +47,13 @@ if (path.length >= 0) {
 console.log(path);
 if (path.length >= 1) {
     if (path[0] === "ues") {
-        breadcrumbs.push({ name: "UEs", url: "/ues" });
+        breadcrumbs.push({name: "UEs", url: "/ues"});
         if (path.length >= 2) {
             let ue = arborescence_cours.find(ue => ue.id === path[1])!;
-            breadcrumbs.push({ name: ue.name, url: `/ues/${ue.id}` });
+            breadcrumbs.push({name: ue.name, url: `/ues/${ue.id}`});
             if (path.length >= 3) {
                 let theme = ue.themes.find(theme => theme.id === path[2])!;
-                breadcrumbs.push({ name: theme.name, url: `/ues/${ue.id}/${theme.id}` });
+                breadcrumbs.push({name: theme.name, url: `/ues/${ue.id}/${theme.id}`});
                 if (path.length >= 4) {
                     let cours = theme.cours.find(cours => cours.id === path[3])!;
                     breadcrumbs.push({
@@ -69,7 +69,6 @@ if (path.length >= 1) {
 }
 const navBarId = "navbarTogglerTarget";
 
-
 ---
 
 <!doctype html>
@@ -80,36 +79,54 @@ const navBarId = "navbarTogglerTarget";
     <meta name="viewport" content="width=device-width"/>
     <link rel="icon" type="image/png" href={faviconSrc.src}/>
     <meta name="generator" content={Astro.generator}/>
-    <base href={Astro.url.pathname + (Astro.url.pathname === '/' ? '' :  '/')} />
+    <base href={Astro.url.pathname + (Astro.url.pathname === '/' ? '' : '/')}/>
     <!--<ViewTransitions/>-->
     <title>Medhi Souk | {title}</title>
 </head>
 <body style="min-height: 100vh">
 <header class="pt-0 px-0">
-    <Navbar class="navbar navbar-expand-lg bg-primary mb-3" data-bs-theme="dark">
-        <Navbar.Toggler controls={navBarId}/>
-        <Navbar.Collapse id={navBarId}>
-            <div class="container-fluid ms-5 navbar-nav align-items-center ">
-                <a class="navbar-brand" href="/">
-                    <Image loading="eager" src={logoSrc} alt="logo" height="100" />
-                </a>
-                <Navbar.Items items={items} class="me-auto mb-2 mb-lg-0"/>
+    <Navbar class="navbar navbar-expand-lg bg-primary px-3 pt-3 pb-4 mx-0 flex-column flex-md-row" data-bs-theme="dark">
+
+        <button
+                class="navbar-toggler m-0 mb-3 align-self-start"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target=`#${navBarId}`
+                aria-controls={navBarId}
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="container-fluid p-0 ms-0  mb-4 mb-md-0 ms-5-lg navbar-nav align-items-center text-center">
+            <a class="navbar-brand m-0" href="/">
+                <Image loading="eager" src={logoSrc} alt="logo" height="100"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id={navBarId}>
+                <ul class="nav ms-0 ms-md-5 mb-0 mb-md-2 mb-lg-0 me-auto nav-fill flex-column flex-md-row">
+                    {items.map(i => (
+                            <li class="nav-item me-0 me-md-2">
+                                <a href={i.href} class="nav-link" class:list={[{"active":i.active}]}>
+                                    {i.text}
+                                </a>
+                            </li>
+                    ))}
+                </ul>
             </div>
-            <div id="searchbox"
-                 class="form-inline mb-lg-0 w-75 d-flex ms-auto me-5">
-                <AlgoliaSearch idToDelete="algoliaPlaceHolder" client:only="svelte">
-                    <div  id="algoliaPlaceHolder" class="placeholder-glow w-100 h-100" slot="fallback">
-                        <div class="placeholder w-100 h-100">&nbsp;</div>
-                    </div>
-                </AlgoliaSearch>
-            </div>
-        </Navbar.Collapse>
+        </div>
+        <div id="searchbox"
+             class="form-inline w-75" style="height: 3rem">
+            <AlgoliaSearch/>
+        </div>
     </Navbar>
-    <div class="ms-5 mb-4 form-inline">
+    <div class="ms-5 mb-4 mt-4 form-inline">
         <Breadcrumb>
             {breadcrumbs.map(breadcrumb => (
-                <Breadcrumb.Item><a href={breadcrumb.url}>{breadcrumb.name}</a></Breadcrumb.Item>
+                    <Breadcrumb.Item><a href={breadcrumb.url}>{breadcrumb.name}</a></Breadcrumb.Item>
             ))}
+            &nbsp; <!-- pour réserver la place si y'a pas de breadcrumbs -->
         </Breadcrumb>
     </div>
 </header>
@@ -119,8 +136,11 @@ const navBarId = "navbarTogglerTarget";
 <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 mx-5 border-top">
     <div class="col-md-4 mb-0 text-muted">
         <p class="text-muted mb-2">Contenu par Pierre MARTINI</p>
-        <p class="mb-2">Développement par <a class="text-muted" href="https://github.com/LelouBil">LelouBil</a> et <a class="text-muted" href="https://github.com/Tyranozomby">Tyranozomby</a>
-            <a class="ms-2" href="https://github.com/LelouBil/site-fiches-medecine"><Image class="d-inline" width="20" src={githubIcon} alt="github icon"/></a>
+        <p class="mb-2">Développement par <a class="text-muted" href="https://github.com/LelouBil">LelouBil</a> et <a
+                class="text-muted" href="https://github.com/Tyranozomby">Tyranozomby</a>
+            <a class="ms-2" href="https://github.com/LelouBil/site-fiches-medecine">
+                <Image class="d-inline" width="20" src={githubIcon} alt="github icon"/>
+            </a>
         </p>
         <p></p>
     </div>
@@ -128,7 +148,6 @@ const navBarId = "navbarTogglerTarget";
 </body>
 </html>
 <script>
-
     import "bootstrap/dist/js/bootstrap.bundle";
 
 </script>

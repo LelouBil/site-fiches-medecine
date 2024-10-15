@@ -166,34 +166,35 @@
             }
         }
         mounted = true
-        if (prefiltered_qcm && questions_count_preview == 0) {
-            mounted = false
-        }
 
     });
 
 
 </script>
 
-{#if prefiltered_qcm && !qcm_running}
-    <div class=" my-2">
-        <button class="d-block btn btn-primary w-50 m-auto mx-auto" on:click={prepareQCM}>Se tester
-            avec {questions_count} questions sur {preSetFilters.context}</button>
+{#if prefiltered_qcm && !qcm_running && questions_count_preview > 0}
+    <div class="my-2">
+        <button class="d-block btn btn-primary m-auto mx-auto text-bg-primary" on:click={prepareQCM}>
+            <mark class="text-success text-bg-primary">Se tester</mark>
+            avec {questions_count} questions sur
+            <mark class="text-decoration-underline text-bg-primary">{preSetFilters.context}</mark>
+        </button>
     </div>
 {/if}
 {#if mounted}
 
 
     {#if (!qcm_running && !prefiltered_qcm)}
-        <h2>Configuration du QCM</h2>
+        <h2 class="text-center">Configuration du QCM</h2>
 
         <div class="row g-3 align-items-center my-2">
             <div class="col-auto">
-                <label for="nombre_questions" class="form-label fs-4 fw-bold">Nombre de questions souhaitées</label>
+                <label for="nombre_questions" class="form-label d-inline fs-4 fw-bold">Nombre de questions&nbsp;:</label>
             </div>
             <div class="col-auto">
                 <input type="number" name="nombre_questions"
-                       class="form-control border-primary border-1 border fw-bolder" aria-describedby="nombreHelpBlock"
+                       class="form-control border-primary border-1 border p-2 fw-bolder"
+                       aria-describedby="nombreHelpBlock"
                        bind:value={questions_count} min="1"
                        max={questions_count_preview}/>
             </div>
@@ -215,7 +216,7 @@
             <div class="card scroll-card">
                 <div class="card-header"><h3 class="card-title text-center">Filtres par difficulté et type</h3></div>
                 <div class="card-body">
-                    <div class="mt-2">
+                    <div class="mt-0">
                         <h3>Difficulté</h3>
                         {#each all_difficulty as difficulty}
                             <div class="form-check form-switch">
@@ -260,43 +261,46 @@
             <div class="card scroll-card">
                 <div class="card-header"><h3 class="card-title d-inline-block text-center">Filtrer par
                     UE/Theme/Cours</h3></div>
-
-                {#each arborescence_cours as ue}
-                    <details class="list mx-3 mt-4" open>
-                        <summary> <span class="form-check-inline"><input type="checkbox" class=form-check-input
-                                                                         on:change={(e) =>  setUE(ue.id,e.target?.checked)}
-                                                                         checked={ue_state_map[ue.id] === SelectionStatus.SELECTED || ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
-                                                                         indeterminate={ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
-                                                                         name={ue.id} id={ue.id}>
+                <div class="card-body px-2 px-md-3 overflow-y-auto" style="height: 10rem">
+                    {#each arborescence_cours as ue}
+                        <details class="list" open>
+                            <summary> <span class="form-check-inline"><input type="checkbox" class=form-check-input
+                                                                             on:change={(e) =>  setUE(ue.id,e.target?.checked)}
+                                                                             checked={ue_state_map[ue.id] === SelectionStatus.SELECTED || ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
+                                                                             indeterminate={ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
+                                                                             name={ue.id} id={ue.id}>
                         <label for="{ue.id}" class="form-check-label">UE&nbsp;: {ue.name}</label></span></summary>
-                        {#each ue.themes as theme}
-                            <details>
-                                <summary><span class="form-check-inline"><input type="checkbox" class="form-check-input"
-                                                                                on:change={(e) => setTheme(theme.id,e.target?.checked)}
-                                                                                name={theme.id}
-                                                                                checked={theme_state_map[theme.id] === SelectionStatus.SELECTED || theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
-                                                                                indeterminate={theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
-                                                                                id={theme.id}><label for="{theme.id}"
-                                                                                                     class="form-check-label">Thème&nbsp;: {theme.name}</label>
+                            {#each ue.themes as theme}
+                                <details>
+                                    <summary><span class="form-check-inline"><input type="checkbox"
+                                                                                    class="form-check-input"
+                                                                                    on:change={(e) => setTheme(theme.id,e.target?.checked)}
+                                                                                    name={theme.id}
+                                                                                    checked={theme_state_map[theme.id] === SelectionStatus.SELECTED || theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
+                                                                                    indeterminate={theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
+                                                                                    id={theme.id}><label
+                                            for="{theme.id}"
+                                            class="form-check-label">Thème&nbsp;: {theme.name}</label>
                             </span>
-                                </summary>
-                                {#each theme.cours as cours}
-                                    <div>
-                                        <div class="form-check">
-                                            <input type="checkbox" name={cours.id} id={cours.id}
-                                                   class="form-check-input"
-                                                   on:change={(e) => setCours(cours.id,e.target?.checked)}
-                                                   checked={question_filters.included_cours.has(cours.id)}
+                                    </summary>
+                                    {#each theme.cours as cours}
+                                        <div>
+                                            <div class="form-check">
+                                                <input type="checkbox" name={cours.id} id={cours.id}
+                                                       class="form-check-input"
+                                                       on:change={(e) => setCours(cours.id,e.target?.checked)}
+                                                       checked={question_filters.included_cours.has(cours.id)}
 
-                                            ><label
-                                                for="{cours.id}" class="form-check-label">{cours.name}</label>
+                                                ><label
+                                                    for="{cours.id}" class="form-check-label">{cours.name}</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                {/each}
-                            </details>
-                        {/each}
-                    </details>
-                {/each}
+                                    {/each}
+                                </details>
+                            {/each}
+                        </details>
+                    {/each}
+                </div>
             </div>
         </div>
 

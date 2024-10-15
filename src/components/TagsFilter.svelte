@@ -77,13 +77,13 @@
             <tbody>
             {#each filteredTags as tag (tag)}
                 <tr class="">
-                    <td class=" py-0 align-middle fs-4">
+                    <td class=" py-0 align-middle fs-5">
                         <div>{highlightSearch(tag).begin}<strong
                             class="ps-0 d-inline">{highlightSearch(tag).middle}</strong>{highlightSearch(tag).end}
                         </div>
                     </td>
-                    <td class="py-0 align-middle">
-                        <div class="btn-group ms-auto me-0 d-flex buttons gap-4 justify-content-end" role="group">
+                    <td class="py-0 align-middle px-1 px-md-auto">
+                        <div class="btn-group ms-md-auto me-0 d-flex buttons gap-4 justify-content-end" role="group">
                             <button class="btn btn-primary  my-2 px-3 py-1" on:click={() => includeTag(tag)}>+</button>
                             <button class="btn btn-outline-primary my-2 px-3 py-1" on:click={() => excludeTag(tag)}>-</button>
                         </div>

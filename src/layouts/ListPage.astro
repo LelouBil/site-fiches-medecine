@@ -14,10 +14,10 @@ const {title} = Astro.props;
     <div class="container">
         <!-- Heading styled for the Lux theme -->
         <MainHeader ><slot name="header"/></MainHeader>
-        <hr class="mb-5 "/>
+        <hr/>
         <slot name="before-elements"/>
         <!-- Vertically ordered list with darker background and enhanced shadow -->
-        <ul transition:name="mainList" transition:animate="initial" class="list-group list-group-flush">
+        <ul transition:name="mainList" transition:animate="initial" class="list-group list-group-flush list-inline gap-3">
            <!--suppress HtmlUnknownTag -->
             <slot name="elements" />
         </ul>

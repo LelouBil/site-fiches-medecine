@@ -2,10 +2,30 @@ import {getSecret} from 'astro:env/server'
 import {algoliasearch} from "algoliasearch";
 import {ALGOLIA_APP_ID} from "astro:env/client";
 import {pagesIndexName} from "@/lib/pagesIndexName.ts";
-import type {AllCours} from "@/lib/files.ts";
+import type {AllCours, CoursId, FicheId, ThemeId, UeId} from "@/lib/files.ts";
 
 const client = algoliasearch(ALGOLIA_APP_ID, getSecret('ALGOLIA_API_KEY')!);
 
+type AlgoliaBase<I,T> = {
+    objectId: I,
+    type: T,
+    name: string,
+    order: number,
+    url: string
+}
+export type AlgoliaUE = AlgoliaBase<UeId,"UE">
+
+type HasParent<T> = {
+    parentId: T,
+    parentOrder: number,
+    parentName: string
+}
+
+export type AlgoliaTheme = AlgoliaBase<ThemeId,"Thème"> & HasParent<UeId>
+export type AlgoliaCours = AlgoliaBase<CoursId, "Cours"> & HasParent<ThemeId>
+export type AlgoliaFiche = AlgoliaBase<FicheId, "Fiche"> & HasParent<CoursId>
+
+export type AlgoliaItem = AlgoliaUE | AlgoliaTheme | AlgoliaCours | AlgoliaFiche
 
 export async function buildPagesIndex(data: AllCours) {
 
@@ -60,7 +80,6 @@ export async function buildPagesIndex(data: AllCours) {
                 type: "UE",
                 order: sortedUEs.indexOf(ue),
                 url: `/ues/${ue.id}`,
-                parentId: null
             },
             ...ue.themes.flatMap(theme => [
                 {

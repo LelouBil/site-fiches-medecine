@@ -1,6 +1,7 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import type {FullQuestion} from "@/lib/files.ts";
+    import 'iconify-icon'
 
     type OptionAnswer = number & { __brand: "OptionAnswer" };
     type TextAnswer = string & { __brand: "TextAnswer" };
@@ -134,6 +135,8 @@
         return possibilities.filter(p => p.toUpperCase() == source.toUpperCase()) || null
     }
 
+    let questionTextRef: HTMlElement;
+
     $: isAnswerChosen = answers[current_question] && answers[current_question] !== "";
 </script>
 
@@ -179,29 +182,42 @@
 {#if questions.length > 0}
     <div>
         {#if questions[current_question]}
-            <div class="d-flex col align-items-center gap-3">
+<!--            <button class="btn-xs float-end btn btn-primary floatingButton z-1" on:click={() => {-->
+<!--                questionTextRef.scrollIntoView(true);-->
+<!--                console.log("scroll",questionTextRef)-->
+<!--            }}>-->
+<!--                <iconify-icon icon="mingcute:down-line" width="1.2rem" height="1.2rem" class="m-1 text-primary"></iconify-icon>-->
+<!--            </button>-->
+
+            <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-3">
                 <div>
-                    <p class="fw-bold fs-4 text-secondary my-0">Question <span
-                            class="text-info">{current_question + 1}</span> sur {questions.length}
-                    </p>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM
+                    </button>
                 </div>
-                <div class="progress flex-fill border-primary border-1 border" role="progressbar"
+                <div class="progress flex-fill  border-primary border-1 border w-75" role="progressbar"
                      aria-label="avancée dans les questions"
                      aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}>
                     <div class="progress-bar" style="width: {progressPercent}%"/>
                 </div>
                 <div>
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM
-                    </button>
+                    <p class="fw-bold fs-4 text-secondary my-0">Question <span
+                            class="text-info">{current_question + 1}</span> sur {questions.length}
+                    </p>
                 </div>
             </div>
-            <p class=" text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
-               style="height: 4.5rem">{questions[current_question].text}</p>
 
+            <div class="p-0 m-0" bind:this={questionTextRef}>
+            <p class=" d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
+               style="min-height: 4.5rem">{questions[current_question].text}</p>
+
+
+            <p class=" d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
+               style="min-height: 5.8rem">{questions[current_question].text}</p>
+            </div>
             {#if questions[current_question].type === 'choices'}
-                <fieldset class="fs-3" style="min-height: 22rem">
+                <fieldset class="answers-field">
                     {#each questions[current_question].options as option, index}
-                        <div class="form-check my-3">
+                        <div class="form-check my-3 h-25">
                             <input
                                     type="checkbox"
                                     class=form-check-input
@@ -212,7 +228,9 @@
                                     on:change={(e) => handleOptionChange(index, e)}
                             />
                             <label for="option-{index}"
-                                   class="form-check-label text-primary-emphasis">{option.text}</label>
+                                   class="d-none d-md-block fs-3 form-check-label text-primary-emphasis">{option.text}</label>
+                            <label for="option-{index}"
+                                   class="d-md-none form-check-label fs-5 text-primary-emphasis" style="min-height: 6rem">{option.text}</label>
                         </div>
                     {/each}
                 </fieldset>
@@ -232,7 +250,8 @@
             <hr class="my-3"/>
             {#each questions as question, index}
                 <div class="question-result">
-                    <p class="text-primary-emphasis fs-2 fw-bold question-text">{index + 1}. {question.text}</p>
+                    <p class="text-primary-emphasis fs-2 fw-bold question-response-text">{index + 1}
+                        . {question.text}</p>
                     {#if question.type === 'choices'}
                         {@const qt_pts = points[index] || 0}
 
@@ -245,7 +264,7 @@
                         {#each question.options.values() as answer, i}
                             {@const correct = answer.correct}
                             {@const checked = answers[index].includes(i)}
-                            <div class="form-check my-3 fs-4">
+                            <div class="form-check my-3 answer-fontsize">
                                 <input class="form-check-input " type="checkbox" id="option-{i}"
                                        checked={answers[index].includes(i)}
                                        inert
@@ -299,10 +318,10 @@
             {/each}
         {/if}
     </div>
-    <hr class="my-4"/>
-    <div class="my-5 d-flex col btn-holder">
+    <hr class="my-0 my-md-4 d-none d-md-block"/>
+    <div class="mt-1 my-md-5 d-flex col btn-holder">
         {#if current_question < questions.length}
-            <button class="btn btn-outline-primary" on:click={previousQuestion} disabled={current_question === 0}>
+            <button id="button_block" class="btn btn-outline-primary" on:click={previousQuestion} disabled={current_question === 0}>
                 Précédent
             </button>
             {#if current_question === questions.length - 1}
@@ -323,7 +342,25 @@
 {/if}
 
 <style>
-    .question-text {
+
+    .answer-fontsize{
+        font-size: 1.25rem;
+    }
+
+
+    .floatingButton {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        /*display: none;*/
+    }
+
+    .answers-field {
+        /*min-height: 22rem;*/
+    }
+
+
+    .question-response-text {
         margin-bottom: 0;
 
         & + span {
@@ -347,6 +384,13 @@
             gap: 0;
             width: 100%;
             justify-content: space-between;
+        }
+
+        .answers-field {
+            /*min-height: 30rem;*/
+        }
+        .answer-fontsize{
+            font-size: 1rem;
         }
     }
 </style>
