@@ -96,7 +96,10 @@
     let questions_count_preview = 1;
     $: {
         questions_count_preview = filterQuestions(all_questions, question_filters).length;
-        questions_count = Math.min(questions_count, questions_count_preview);
+        // questions_count = Math.min(questions_count, questions_count_preview);
+        if(questions_count == 0){
+            questions_count = Math.min(defaultQuestionCount,questions_count_preview)
+        }
     }
 
     let questions_count = defaultQuestionCount;
@@ -182,14 +185,19 @@
             </div>
             <div class="col-auto">
                 <input type="number" name="nombre_questions"
-                       class="form-control border-primary border-1 border p-2 fw-bolder"
+                       class="form-control border-1 border p-2 fw-bolder"
                        aria-describedby="nombreHelpBlock"
+                       class:border-primary={questions_count <= questions_count_preview && questions_count >= 1}
+                       class:border-danger={questions_count > questions_count_preview || questions_count <=0}
                        bind:value={questions_count} min="1"
                        max={questions_count_preview}/>
             </div>
             <div class="col-auto">
                 <span class="form-text"
-                      id="nombreHelpBlock">Nombre de question correspondants aux filtres: {questions_count_preview}</span>
+                      class:text-danger={questions_count > questions_count_preview}
+                      class:fw-bold={questions_count > questions_count_preview}
+                      class:fs-5={questions_count > questions_count_preview}
+                      id="nombreHelpBlock">Nombre de question correspondants aux filtres: <mark class=" p-0 bg-secondary" class:fw-bolder={questions_count > questions_count_preview}>{questions_count_preview}</mark></span>
             </div>
         </div>
 
@@ -251,7 +259,7 @@
                 <div class="card-header"><h3 class="card-title d-inline-block text-center">Filtrer par
                     UE/Theme/Cours</h3></div>
                 <div class="card-body px-2 px-md-3 overflow-y-auto" style="height: 10rem">
-                    {#each arborescence_cours as ue}
+                    {#each arborescence_cours.filter(u => all_questions.some(q => q.ue_id === u.id)) as ue}
                         <details class="list" open>
                             <summary> <span class="form-check-inline"><input type="checkbox" class=form-check-input
                                                                              on:change={(e) =>  setUE(ue.id,e.target?.checked)}
@@ -259,7 +267,7 @@
                                                                              indeterminate={ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
                                                                              name={ue.id} id={ue.id}>
                         <label for="{ue.id}" class="form-check-label">UE&nbsp;: {ue.name}</label></span></summary>
-                            {#each ue.themes as theme}
+                            {#each ue.themes.filter(t => all_questions.some(q => q.theme_id === t.id)) as theme}
                                 <details>
                                     <summary><span class="form-check-inline"><input type="checkbox"
                                                                                     class="form-check-input"
@@ -272,7 +280,7 @@
                                             class="form-check-label">Thème&nbsp;: {theme.name}</label>
                             </span>
                                     </summary>
-                                    {#each theme.cours as cours}
+                                    {#each theme.cours.filter(c => all_questions.some(q => q.cours_id === c.id)) as cours}
                                         <div>
                                             <div class="form-check">
                                                 <input type="checkbox" name={cours.id} id={cours.id}
@@ -294,9 +302,12 @@
         </div>
 
         <button class="btn btn-outline-primary mb-4" id="start-button"
-                disabled={questions_count_preview === 0 || questions_count === 0}
+                disabled={questions_count_preview === 0 || questions_count === 0 || questions_count > questions_count_preview || questions_count <= 0}
+
                 on:click={prepareQCM}>
-            {(questions_count_preview === 0) ? "Aucune question ne correspond au filtres" : (questions_count === 0 ? "Il faut choisir au moins une question" : `Démarrer ${questions_count} questions`)}
+            {(questions_count_preview === 0) ? "Aucune question ne correspond au filtres" : (questions_count === 0 ? "Il faut choisir au moins une question" :
+                questions_count <= 0 || questions_count > questions_count_preview ? `Les filtres renseignés font moins de ${questions_count} questions` :
+                `Démarrer ${questions_count} questions`)}
         </button>
     {/if}
     {#if qcm_running}

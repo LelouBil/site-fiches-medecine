@@ -36,6 +36,9 @@
         const storage = localStorage.getItem("answers");
         if (storage) {
             answers = JSON.parse(storage);
+        } else {
+            localStorage.removeItem("qcm_time")
+            localStorage.removeItem("current_question")
         }
         const current = localStorage.getItem("current_question");
         if (current) {
@@ -89,10 +92,34 @@
         answers = newTab;
         if (save_answers)
             loadStorage();
+        return startDurationTrack();
     });
 
-    const difficuly_map: {[diff in Difficulty]: {icon: string, color_class: string}} = {
-        easy :{
+    function startDurationTrack(): () => void {
+        if (save_answers && current_question < questions.length) {
+            let int: NodeJS.Timeout | undefined = undefined;
+            const timeStep = () => {
+                // if tab has focus
+                if (document.visibilityState === "visible") {
+
+                    const currentStoredTime = localStorage.getItem("qcm_time") ?? "0";
+                    const currentTime = JSON.parse(currentStoredTime);
+                    localStorage.setItem("qcm_time", JSON.stringify(currentTime + 1));
+                }
+                console.log("interval",current_question,questions.length)
+                if (current_question >= questions.length) {
+                    clearInterval(int);
+                }
+            }
+            int = setInterval(timeStep, 1000);
+            return () => clearInterval(int);
+        }
+        return () => {
+        };
+    }
+
+    const difficuly_map: { [diff in Difficulty]: { icon: string, color_class: string } } = {
+        easy: {
             icon: "line-md:gauge-empty",
             color_class: "text-success"
         },
@@ -151,6 +178,23 @@
         }
     }
 
+    function formatTime(seconds: number){
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const sec = seconds % 60;
+        let res = ""
+        if(hours > 0){
+            res += `${hours}h `
+        }
+        if(minutes > 0){
+            res += `${minutes}m `
+        }
+        if(sec > 0){
+            res += `${sec}s`
+        }
+        return res
+    }
+
 
     function getMatches(source: TextAnswer, possibilities: string[]) {
         return possibilities.filter(p => p.toUpperCase() == source.toUpperCase())
@@ -204,12 +248,12 @@
     <div>
         {#if questions[current_question]}
             {@const diffvalues = difficuly_map[questions[current_question].difficulty]}
-<!--            <button class="btn-xs float-end btn btn-primary floatingButton z-1" on:click={() => {-->
-<!--                questionTextRef.scrollIntoView(true);-->
-<!--                console.log("scroll",questionTextRef)-->
-<!--            }}>-->
-<!--                <iconify-icon icon="mingcute:down-line" width="1.2rem" height="1.2rem" class="m-1 text-primary"></iconify-icon>-->
-<!--            </button>-->
+            <!--            <button class="btn-xs float-end btn btn-primary floatingButton z-1" on:click={() => {-->
+            <!--                questionTextRef.scrollIntoView(true);-->
+            <!--                console.log("scroll",questionTextRef)-->
+            <!--            }}>-->
+            <!--                <iconify-icon icon="mingcute:down-line" width="1.2rem" height="1.2rem" class="m-1 text-primary"></iconify-icon>-->
+            <!--            </button>-->
 
             <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-2">
                 <div>
@@ -226,19 +270,19 @@
                             class="text-info">{current_question + 1}</span> sur {questions.length}
 
                     </p>
-                        <iconify-icon  inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
-                                      title={`Question ${questionDifficultyNames[questions[current_question].difficulty]}`}
-                                      width="1.8rem" height="1.8rem"></iconify-icon>
+                    <iconify-icon inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
+                                  title={`Question ${questionDifficultyNames[questions[current_question].difficulty]}`}
+                                  width="1.8rem" height="1.8rem"></iconify-icon>
                 </div>
             </div>
 
             <div class="p-0 m-0" bind:this={questionTextRef}>
-            <p class=" d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
-               style="min-height: 4.5rem">{questions[current_question].text}</p>
+                <p class=" d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
+                   style="min-height: 4.5rem">{questions[current_question].text}</p>
 
 
-            <p class=" d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
-               style="min-height: 5.8rem">{questions[current_question].text}</p>
+                <p class=" d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
+                   style="min-height: 5.8rem">{questions[current_question].text}</p>
             </div>
             {#if questions[current_question].type === 'choices'}
                 <fieldset class="answers-field">
@@ -256,13 +300,14 @@
                             <label for="option-{index}"
                                    class="d-none d-md-block fs-3 form-check-label text-primary-emphasis">{option.text}</label>
                             <label for="option-{index}"
-                                   class="d-md-none form-check-label fs-5 text-primary-emphasis" style="min-height: 6rem">{option.text}</label>
+                                   class="d-md-none form-check-label fs-5 text-primary-emphasis"
+                                   style="min-height: 6rem">{option.text}</label>
                         </div>
                     {/each}
                 </fieldset>
             {:else if questions[current_question].type === 'text'}
                 <input
-                        class="form-control border border-1 border-primary"
+                        class="form-control border border-1 border-primary my-5"
                         type="text"
                         value={answers[current_question]}
                         on:input={handleTextChange}
@@ -270,8 +315,14 @@
                 />
             {/if}
         {:else}
-            <h2 class="my-2 fs-3">Résultats</h2>
-            <h1 class="my-2" style="font-size:30pt">Note: {Number(points.reduce((a, b) => a + b).toFixed(2))}/{questions.length}</h1>
+            <div class="d-flex flex-row gap-2 align-items-center">
+                <h2 class="my-2 fs-3">Résultats</h2>
+                {#if save_answers}
+                    <p class="text-secondary-emphasis mb-0" style="vertical-align: center">(Temps passé: {formatTime(JSON.parse(localStorage.getItem("qcm_time") ?? "0"))})</p>
+                {/if}
+            </div>
+            <h1 class="my-2" style="font-size:30pt">Note: {Number(points.reduce((a, b) => a + b).toFixed(2))}
+                /{questions.length}</h1>
             <hr class="my-3"/>
             {#each questions as question, index}
                 {@const diffvalues = difficuly_map[question.difficulty]}
@@ -282,9 +333,9 @@
 
                     <div class="d-flex flex-row gap-1 my-3 " style="margin-left: -0.25rem">
 
-                        <iconify-icon  inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
-                                       title={`Question ${questionDifficultyNames[question.difficulty]}`}
-                                       width="1.8rem" height="1.8rem"></iconify-icon>
+                        <iconify-icon inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
+                                      title={`Question ${questionDifficultyNames[question.difficulty]}`}
+                                      width="1.8rem" height="1.8rem"></iconify-icon>
                         <span
                                 class="fw-bolder fs-4"
                                 class:text-success={qt_pts === 1}
@@ -296,32 +347,32 @@
                     </div>
                     {#if question.type === 'choices'}
                         <div class="d-flex gap-3 flex-column">
-                        {#each question.options.values() as answer, i}
-                            {@const correct = answer.correct}
-                            {@const checked = answers[index].includes(i)}
-                            <div class="form-check answer-fontsize">
-                                <input class="form-check-input " type="checkbox" id="option-{i}"
-                                       checked={answers[index].includes(i)}
-                                       inert
-                                       class:bg-success={checked && correct}
-                                       class:bg-danger={checked && !correct}
-                                       class:bg-warning={!checked && correct}
-                                       class:bg-secondary={!checked && !correct}
-                                >
-                                <label
+                            {#each question.options.values() as answer, i}
+                                {@const correct = answer.correct}
+                                {@const checked = answers[index].includes(i)}
+                                <div class="form-check answer-fontsize">
+                                    <input class="form-check-input " type="checkbox" id="option-{i}"
+                                           checked={answers[index].includes(i)}
+                                           inert
+                                           class:bg-success={checked && correct}
+                                           class:bg-danger={checked && !correct}
+                                           class:bg-warning={!checked && correct}
+                                           class:bg-secondary={!checked && !correct}
+                                    >
+                                    <label
 
-                                        class:text-success={checked && correct}
-                                        class:text-danger={checked && !correct}
-                                        class:text-warning={!checked && correct}
-                                        class:text-secondary={!checked && !correct}
+                                            class:text-success={checked && correct}
+                                            class:text-danger={checked && !correct}
+                                            class:text-warning={!checked && correct}
+                                            class:text-secondary={!checked && !correct}
 
-                                        class="form-check-label fw-bold" style="pointer-events: none"
-                                        for="option-{i}"
-                                >
-                                    <span class="font-monospace fw-bolder">{correct ? "[Vrai]" : "[Faux]"}</span>
-                                    {answer.text}
-                                </label></div>
-                        {/each}
+                                            class="form-check-label fw-bold" style="pointer-events: none"
+                                            for="option-{i}"
+                                    >
+                                        <span class="font-monospace fw-bolder">{correct ? "[Vrai]" : "[Faux]"}</span>
+                                        {answer.text}
+                                    </label></div>
+                            {/each}
                         </div>
                     {:else if question.type === 'text'}
                         {@const matches = getMatches(answers[index], question.answers)}
@@ -357,7 +408,8 @@
     <hr class="my-0 my-md-4 d-none d-md-block"/>
     <div class="mt-1 my-md-5 d-flex col btn-holder">
         {#if current_question < questions.length}
-            <button id="button_block" class="btn btn-outline-primary" on:click={previousQuestion} disabled={current_question === 0}>
+            <button id="button_block" class="btn btn-outline-primary" on:click={previousQuestion}
+                    disabled={current_question === 0}>
                 Précédent
             </button>
             {#if current_question === questions.length - 1}
@@ -379,7 +431,7 @@
 
 <style>
 
-    .answer-fontsize{
+    .answer-fontsize {
         font-size: 1.25rem;
     }
 
@@ -425,7 +477,8 @@
         .answers-field {
             /*min-height: 30rem;*/
         }
-        .answer-fontsize{
+
+        .answer-fontsize {
             font-size: 1rem;
         }
     }
