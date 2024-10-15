@@ -80,7 +80,7 @@ const navBarId = "navbarTogglerTarget";
     <meta name="viewport" content="width=device-width"/>
     <link rel="icon" type="image/png" href={faviconSrc.src}/>
     <meta name="generator" content={Astro.generator}/>
-    <base href={Astro.url.pathname + "/"}/>
+    <base href={Astro.url.pathname + (Astro.url.pathname === '/' ? '' :  '/')} />
     <!--<ViewTransitions/>-->
     <title>Medhi Souk | {title}</title>
 </head>
