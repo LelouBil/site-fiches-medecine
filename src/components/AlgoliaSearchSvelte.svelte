@@ -43,9 +43,9 @@
     );
 
     let autocomplete: AutocompleteApi<AlgoliaItem> | null = buildAutoComplete()
-    onMount(() => {
-        autocomplete = buildAutoComplete()
-    })
+    // onMount(() => {
+    //     autocomplete = buildAutoComplete()
+    // })
 
 
     function buildAutoComplete() {
@@ -55,7 +55,7 @@
             },
             autoFocus: false,
             placeholder: "Rechercher un cours / une UE / une fiche",
-            openOnFocus: false,
+            openOnFocus: true,
             insights: true,
             getSources({query}) {
                 let newVar: AutocompleteSource<any> = {
@@ -109,19 +109,18 @@
             <div class="aa-InputWrapper">
                 <!-- autocorrect = safari only -->
                 <input class="aa-Input" style="text-overflow: ellipsis" bind:this={inputRef}
-                       {...inputProps}
+                       {...Object.fromEntries(Object.entries(inputProps).filter(([_,v]) => v))}
                        on:click={inputProps.onClick}
                        on:blur={inputProps.onBlur}
                        on:focus={inputProps.onFocus}
                        on:keydown={inputProps.onKeyDown}
-                       on:change={inputProps.onChange}
+                       on:input={inputProps.onChange}
                        on:compositionend={inputProps.onCompositionEnd}
 
                 />
             </div>
             <div class="aa-InputWrapperSuffix">
-                <button class="aa-ClearButton btn-close" aria-label="close">
-                    ｘ
+                <button class="aa-ClearButton btn-close"  aria-label="close">
                 </button>
             </div>
         </form>

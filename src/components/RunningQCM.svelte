@@ -2,6 +2,8 @@
     import {onMount} from "svelte";
     import type {FullQuestion} from "@/lib/files.ts";
     import 'iconify-icon'
+    import type {Difficulty} from "@/lib/questionSchema.ts";
+    import {questionDifficultyNames} from "@/lib/names.js";
 
     type OptionAnswer = number & { __brand: "OptionAnswer" };
     type TextAnswer = string & { __brand: "TextAnswer" };
@@ -89,6 +91,25 @@
             loadStorage();
     });
 
+    const difficuly_map: {[diff in Difficulty]: {icon: string, color_class: string}} = {
+        easy :{
+            icon: "line-md:gauge-empty",
+            color_class: "text-secondary-emphasis"
+        },
+        medium: {
+            icon: "line-md:gauge-low",
+            color_class: "text-primary"
+        },
+        hard: {
+            icon: "line-md:gauge",
+            color_class: "text-warning"
+        },
+        impossible: {
+            icon: "line-md:gauge-full",
+            color_class: "text-danger"
+        }
+    }
+
     let points: number[] = []
 
     $: {
@@ -119,7 +140,7 @@
                         break
                 }
             } else if (question.type === "text") {
-                if (getMatches(answer as TextAnswer, question.answers)) {
+                if (getMatches(answer as TextAnswer, question.answers).length >= 1) {
                     pts = 1
                 } else {
                     pts = 0
@@ -132,7 +153,7 @@
 
 
     function getMatches(source: TextAnswer, possibilities: string[]) {
-        return possibilities.filter(p => p.toUpperCase() == source.toUpperCase()) || null
+        return possibilities.filter(p => p.toUpperCase() == source.toUpperCase())
     }
 
     let questionTextRef: HTMlElement;
@@ -182,6 +203,7 @@
 {#if questions.length > 0}
     <div>
         {#if questions[current_question]}
+            {@const diffvalues = difficuly_map[questions[current_question].difficulty]}
 <!--            <button class="btn-xs float-end btn btn-primary floatingButton z-1" on:click={() => {-->
 <!--                questionTextRef.scrollIntoView(true);-->
 <!--                console.log("scroll",questionTextRef)-->
@@ -189,7 +211,7 @@
 <!--                <iconify-icon icon="mingcute:down-line" width="1.2rem" height="1.2rem" class="m-1 text-primary"></iconify-icon>-->
 <!--            </button>-->
 
-            <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-3">
+            <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-2">
                 <div>
                     <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM
                     </button>
@@ -199,10 +221,14 @@
                      aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}>
                     <div class="progress-bar" style="width: {progressPercent}%"/>
                 </div>
-                <div>
+                <div class="d-flex flex-row gap-1">
                     <p class="fw-bold fs-4 text-secondary my-0">Question <span
                             class="text-info">{current_question + 1}</span> sur {questions.length}
+
                     </p>
+                        <iconify-icon  inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
+                                      title={`Question ${questionDifficultyNames[questions[current_question].difficulty]}`}
+                                      width="1.8rem" height="1.8rem"></iconify-icon>
                 </div>
             </div>
 
@@ -217,7 +243,7 @@
             {#if questions[current_question].type === 'choices'}
                 <fieldset class="answers-field">
                     {#each questions[current_question].options as option, index}
-                        <div class="form-check my-3 h-25">
+                        <div class="form-check my-3 h-25 d-flex align-items-baseline gap-1">
                             <input
                                     type="checkbox"
                                     class=form-check-input
@@ -245,26 +271,35 @@
             {/if}
         {:else}
             <h2 class="my-2 fs-3">Résultats</h2>
-            <h1 class="my-2" style="font-size:30pt">Note: {points.reduce((a, b) => a + b).toFixed(2)}
-                /{questions.length}</h1>
+            <h1 class="my-2" style="font-size:30pt">Note: {Number(points.reduce((a, b) => a + b).toFixed(2))}/{questions.length}</h1>
             <hr class="my-3"/>
             {#each questions as question, index}
+                {@const diffvalues = difficuly_map[question.difficulty]}
+                {@const qt_pts = points[index] || 0}
                 <div class="question-result">
                     <p class="text-primary-emphasis fs-2 fw-bold question-response-text">{index + 1}
                         . {question.text}</p>
-                    {#if question.type === 'choices'}
-                        {@const qt_pts = points[index] || 0}
 
+                    <div class="d-flex flex-row gap-1 my-3 " style="margin-left: -0.25rem">
+
+                        <iconify-icon  inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
+                                       title={`Question ${questionDifficultyNames[question.difficulty]}`}
+                                       width="1.8rem" height="1.8rem"></iconify-icon>
                         <span
                                 class="fw-bolder fs-4"
                                 class:text-success={qt_pts === 1}
                                 class:text-warning={qt_pts > 0 && qt_pts < 1}
                                 class:text-danger={qt_pts === 0}
-                        >Points&thinsp;: {qt_pts}</span>
+                        >
+
+                            Points&thinsp;: {qt_pts}</span>
+                    </div>
+                    {#if question.type === 'choices'}
+                        <div class="d-flex gap-3 flex-column">
                         {#each question.options.values() as answer, i}
                             {@const correct = answer.correct}
                             {@const checked = answers[index].includes(i)}
-                            <div class="form-check my-3 answer-fontsize">
+                            <div class="form-check answer-fontsize">
                                 <input class="form-check-input " type="checkbox" id="option-{i}"
                                        checked={answers[index].includes(i)}
                                        inert
@@ -287,6 +322,7 @@
                                     {answer.text}
                                 </label></div>
                         {/each}
+                        </div>
                     {:else if question.type === 'text'}
                         {@const matches = getMatches(answers[index], question.answers)}
                         <input

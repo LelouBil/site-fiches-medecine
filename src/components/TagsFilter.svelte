@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { QuestionTag } from "@/lib/questionSchema.ts";
+    import type {QuestionTag} from "@/lib/questionSchema.ts";
 
     export let included: Set<QuestionTag>;
     export let excluded: Set<QuestionTag>;
@@ -26,15 +26,22 @@
     }
 
     function highlightSearch(tag: QuestionTag) {
-        const elems = search.length > 0 ? tag.split(search) : [tag];
+        const splitIdx = norm(tag).indexOf(norm(search));
+        const elems = [tag.slice(0, splitIdx), tag.slice(splitIdx, splitIdx + search.length), tag.slice(splitIdx + search.length)];
         return {
             begin: elems[0],
-            middle: search,
-            end: elems.length >= 2 ? elems.slice(1).join("") : ""
+            middle: elems[1],
+            end: elems[2]
         };
     }
 
-    $: filteredTags = Array.from(dataset).filter(tag => tag.includes(search) && !included.has(tag) && !excluded.has(tag)).slice(0, 8);
+    function norm(txt: string) {
+        return txt.normalize("NFKD")
+            .replace(/\p{Diacritic}/gu, "")
+            .toUpperCase()
+    }
+
+    $: filteredTags = Array.from(dataset).filter(tag => norm(tag).includes(norm(search)) && !included.has(tag) && !excluded.has(tag)).slice(0, 8);
 
 </script>
 
@@ -79,13 +86,14 @@
                 <tr class="">
                     <td class=" py-0 align-middle fs-5">
                         <div>{highlightSearch(tag).begin}<strong
-                            class="ps-0 d-inline">{highlightSearch(tag).middle}</strong>{highlightSearch(tag).end}
+                                class="ps-0 d-inline">{highlightSearch(tag).middle}</strong>{highlightSearch(tag).end}
                         </div>
                     </td>
                     <td class="py-0 align-middle px-1 px-md-auto">
                         <div class="btn-group ms-md-auto me-0 d-flex buttons gap-4 justify-content-end" role="group">
                             <button class="btn btn-primary  my-2 px-3 py-1" on:click={() => includeTag(tag)}>+</button>
-                            <button class="btn btn-outline-primary my-2 px-3 py-1" on:click={() => excludeTag(tag)}>-</button>
+                            <button class="btn btn-outline-primary my-2 px-3 py-1" on:click={() => excludeTag(tag)}>-
+                            </button>
                         </div>
                     </td>
                 </tr>

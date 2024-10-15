@@ -6,13 +6,14 @@
     import type {AllCours, CoursId, FullQuestion} from "@/lib/files.ts";
     import type {Difficulty, QuestionTag, QuestionType} from "@/lib/questionSchema.ts";
 
-    import type {QcmFilters, PreSetFilters} from "@/lib/qcmFilters.ts";
+    import type {PreSetFilters, QcmFilters} from "@/lib/qcmFilters.ts";
 
     import "es-iterator-helpers/auto";
     import TagsFilter from "@/components/TagsFilter.svelte";
     import RunningQCM from "@/components/RunningQCM.svelte";
     import {questionSchema} from "@/lib/questionSchema.js";
     import {z} from "zod";
+    import {questionDifficultyNames, questionTypeNames} from "@/lib/names.ts";
 
     export let all_questions: FullQuestion[];
     export let all_difficulty: Set<Difficulty>;
@@ -138,18 +139,6 @@
 
     let questions: FullQuestion[] = [];
 
-    const difficultyMap: { [diff: Difficulty]: string } = {
-        "easy": "Facile",
-        "medium": "Moyen",
-        "hard": "Difficile",
-        "impossible": "Antagoniste"
-    }
-
-    const typeMap: { [type: QuestionType]: string } = {
-        "choices": "QCM",
-        "text": "Texte libre"
-    }
-
     let mounted = false;
 
     onMount(() => {
@@ -231,7 +220,7 @@
                        }}
                                        checked={question_filters.included_difficulty.has(difficulty)}
                                 ><label for="{difficulty}" class="form-check-label">
-                                {difficultyMap[difficulty]}
+                                {questionDifficultyNames[difficulty]}
                             </label>
                             </div>
                         {/each}
@@ -251,7 +240,7 @@
                            }
                        }}
                                        checked={question_filters.included_type.has(type)}
-                                ><label for="{type}" class=form-check-label>{typeMap[type]}</label>
+                                ><label for="{type}" class=form-check-label>{questionTypeNames[type]}</label>
                             </div>
                         {/each}
                     </div>
