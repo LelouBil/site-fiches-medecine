@@ -29,7 +29,10 @@ const theme = ue.themes.find(theme => theme.id === theme_id)!;
     </Fragment>
 
     <Fragment slot="after-elements">
-        <QCMWrapper preSetFilters={{...defaultFilters,
+        <QCMWrapper
+
+                defaultQuestionCount={10}
+                preSetFilters={{...defaultFilters,
             context: `le thème ${theme.name}`,
             included_cours: new Set(theme.cours.map(c => c.id))}}/>
     </Fragment>

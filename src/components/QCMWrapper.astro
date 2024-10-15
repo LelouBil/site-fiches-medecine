@@ -12,9 +12,10 @@ import type { PreSetFilters } from "../lib/qcmFilters";
 
 interface Props {
     preSetFilters?: PreSetFilters;
+    defaultQuestionCount?: number
 }
 
-const { preSetFilters } = Astro.props;
+const { preSetFilters, defaultQuestionCount } = Astro.props;
 ---
 <QCM
     all_questions={all_questions}
@@ -24,5 +25,6 @@ const { preSetFilters } = Astro.props;
     all_difficulty={all_difficulty}
     defaultFilters={defaultFilters}
     preSetFilters={preSetFilters ?? null}
+    defaultQuestionCount={defaultQuestionCount ?? 20}
     client:load
 />

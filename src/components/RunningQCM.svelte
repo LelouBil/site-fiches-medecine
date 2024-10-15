@@ -33,17 +33,6 @@
         const storage = localStorage.getItem("answers");
         if (storage) {
             answers = JSON.parse(storage);
-        } else {
-            const newTab = [];
-            for (const q of questions) {
-                if (q.type == "choices") {
-                    newTab.push([]);
-                } else if (q.type == "text") {
-                    newTab.push("");
-                }
-            }
-            answers = newTab;
-
         }
         const current = localStorage.getItem("current_question");
         if (current) {
@@ -86,7 +75,17 @@
     }
 
     onMount(() => {
-        loadStorage();
+        const newTab = [];
+        for (const q of questions) {
+            if (q.type == "choices") {
+                newTab.push([]);
+            } else if (q.type == "text") {
+                newTab.push("");
+            }
+        }
+        answers = newTab;
+        if (save_answers)
+            loadStorage();
     });
 
     let points: number[] = []
@@ -118,10 +117,10 @@
                         pts = 0;
                         break
                 }
-            }else if (question.type === "text"){
-                if(getMatches(answer as TextAnswer,question.answers)){
+            } else if (question.type === "text") {
+                if (getMatches(answer as TextAnswer, question.answers)) {
                     pts = 1
-                }else{
+                } else {
                     pts = 0
                 }
                 //todo QCS
@@ -139,8 +138,8 @@
 </script>
 
 <div aria-hidden="true" class="modal fade" id="quitConfirm" tabindex="-1">
-    <div class="modal-dialog bg-secondary">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-secondary">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Voulez vous arrêter ce QCM ?</h1>
                 <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
@@ -158,8 +157,8 @@
 </div>
 
 <div aria-hidden="true" class="modal fade" id="submitConfirm" tabindex="-1">
-    <div class="modal-dialog bg-secondary">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-secondary">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Voulez vous valider vos Réponses ?</h1>
                 <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
@@ -182,7 +181,7 @@
         {#if questions[current_question]}
             <div class="d-flex col align-items-center gap-3">
                 <div>
-                    <p class="fw-bold fs-5 text-secondary my-0">Question <span
+                    <p class="fw-bold fs-4 text-secondary my-0">Question <span
                             class="text-info">{current_question + 1}</span> sur {questions.length}
                     </p>
                 </div>
@@ -196,10 +195,11 @@
                     </button>
                 </div>
             </div>
-            <p class=" text-primary-emphasis fs-2 fw-bold mt-4 mb-2">{questions[current_question].text}</p>
+            <p class=" text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
+               style="height: 4.5rem">{questions[current_question].text}</p>
 
             {#if questions[current_question].type === 'choices'}
-                <fieldset>
+                <fieldset class="fs-3" style="min-height: 22rem">
                     {#each questions[current_question].options as option, index}
                         <div class="form-check my-3">
                             <input
@@ -226,25 +226,26 @@
                 />
             {/if}
         {:else}
-            <h2 class="my-2">Résultats</h2>
-            <h1 class="my-2">Note: {points.reduce((a,b) => a + b)}/{questions.length}</h1>
+            <h2 class="my-2 fs-3">Résultats</h2>
+            <h1 class="my-2" style="font-size:30pt">Note: {points.reduce((a, b) => a + b).toFixed(2)}
+                /{questions.length}</h1>
             <hr class="my-3"/>
             {#each questions as question, index}
                 <div class="question-result">
-                    <p class="text-primary-emphasis fs-3 fw-bold question-text">{index + 1}. {question.text}</p>
+                    <p class="text-primary-emphasis fs-2 fw-bold question-text">{index + 1}. {question.text}</p>
                     {#if question.type === 'choices'}
                         {@const qt_pts = points[index] || 0}
 
                         <span
                                 class="fw-bolder fs-4"
-                            class:text-success={qt_pts === 1}
-                            class:text-warning={qt_pts > 0 && qt_pts < 1}
-                            class:text-danger={qt_pts === 0}
+                                class:text-success={qt_pts === 1}
+                                class:text-warning={qt_pts > 0 && qt_pts < 1}
+                                class:text-danger={qt_pts === 0}
                         >Points&thinsp;: {qt_pts}</span>
                         {#each question.options.values() as answer, i}
                             {@const correct = answer.correct}
                             {@const checked = answers[index].includes(i)}
-                            <div class="form-check my-3">
+                            <div class="form-check my-3 fs-4">
                                 <input class="form-check-input " type="checkbox" id="option-{i}"
                                        checked={answers[index].includes(i)}
                                        inert
@@ -252,7 +253,6 @@
                                        class:bg-danger={checked && !correct}
                                        class:bg-warning={!checked && correct}
                                        class:bg-secondary={!checked && !correct}
-
                                 >
                                 <label
 
@@ -264,7 +264,7 @@
                                         class="form-check-label fw-bold" style="pointer-events: none"
                                         for="option-{i}"
                                 >
-                                    <span class="font-monospace fw-bolder fs-5">{correct ? "[Vrai]" : "[Faux]"}</span>
+                                    <span class="font-monospace fw-bolder">{correct ? "[Vrai]" : "[Faux]"}</span>
                                     {answer.text}
                                 </label></div>
                         {/each}

@@ -20,13 +20,13 @@
     export let all_types: Set<QuestionType>;
     export let arborescence_cours: AllCours;
     export let preSetFilters: PreSetFilters | null = null;
+    export let defaultQuestionCount: number;
     export let defaultFilters: QcmFilters;
 
 
     const question_filters: QcmFilters = preSetFilters ?? defaultFilters;
 
     const prefiltered_qcm = preSetFilters != null;
-
 
 
     enum SelectionStatus {
@@ -98,7 +98,7 @@
         questions_count = Math.min(questions_count, questions_count_preview);
     }
 
-    let questions_count = 20;
+    let questions_count = defaultQuestionCount;
 
     function filterQuestions(questions: FullQuestion[], filters: QcmFilters): FullQuestion[] {
         return questions.filter(q => {
@@ -131,7 +131,8 @@
     function quitQCM() {
         questions = [];
         qcm_running = false;
-        localStorage.removeItem("questions");
+        if (!prefiltered_qcm)
+            localStorage.removeItem("questions");
     }
 
 
@@ -176,7 +177,8 @@
 
 {#if prefiltered_qcm && !qcm_running}
     <div class=" my-2">
-        <button class="d-block btn btn-primary w-50 m-auto mx-auto" on:click={prepareQCM}>Se tester avec {questions_count} questions sur {preSetFilters.context}</button>
+        <button class="d-block btn btn-primary w-50 m-auto mx-auto" on:click={prepareQCM}>Se tester
+            avec {questions_count} questions sur {preSetFilters.context}</button>
     </div>
 {/if}
 {#if mounted}

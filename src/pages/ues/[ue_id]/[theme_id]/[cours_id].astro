@@ -40,7 +40,10 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
             </div>
     ))}
 
-    <QCMWrapper preSetFilters={{...defaultFilters,
+    <QCMWrapper
+
+            defaultQuestionCount={10}
+            preSetFilters={{...defaultFilters,
         context: `le cours`,
         included_cours: new Set([cours.id])}}/>
 
