@@ -26,6 +26,10 @@
     export let defaultFilters: QcmFilters;
 
 
+    const cours_with_questions = new Set(all_questions.map(q => q.cours_id)).values().toArray()
+    const themes_with_questions = new Set(all_questions.map(q => q.theme_id)).values().toArray()
+    const ues_with_questions = new Set(all_questions.map(q => q.ue_id)).values().toArray()
+
     const question_filters: QcmFilters = preSetFilters ?? defaultFilters;
 
     const prefiltered_qcm = preSetFilters != null;
@@ -41,10 +45,11 @@
     $: theme_state_map = arborescence_cours.flatMap(ue => ue.themes).reduce((map: {
         [theme_id: string]: SelectionStatus
     }, theme) => {
-        const selected_cours = theme.cours.filter(c => question_filters.included_cours.has(c.id));
+        let actual_cours = all_questions.filter(c => c.theme_id == theme.id).map(c => c.cours_id);
+        const selected_cours = actual_cours.filter(c => question_filters.included_cours.has(c));
         if (selected_cours.length === 0) {
             map[theme.id] = SelectionStatus.UNSELECTED;
-        } else if (selected_cours.length === theme.cours.length) {
+        } else if (selected_cours.length === actual_cours.length) {
             map[theme.id] = SelectionStatus.SELECTED;
         } else {
             map[theme.id] = SelectionStatus.INDETERMINATE;
@@ -54,10 +59,11 @@
 
     let ue_state_map: { [ue_id: string]: SelectionStatus } = {};
     $: ue_state_map = arborescence_cours.reduce((map: { [ue_id: string]: SelectionStatus }, ue) => {
-        const selected_themes = ue.themes.filter(t => theme_state_map[t.id] === SelectionStatus.SELECTED);
+        let actual_themes = all_questions.filter(c => c.ue_id === ue.id).map(c => c.theme_id);
+        const selected_themes = actual_themes.filter(t => theme_state_map[t] === SelectionStatus.SELECTED);
         if (selected_themes.length === 0) {
             map[ue.id] = SelectionStatus.UNSELECTED;
-        } else if (selected_themes.length === ue.themes.length) {
+        } else if (selected_themes.length === actual_themes.length) {
             map[ue.id] = SelectionStatus.SELECTED;
         } else {
             map[ue.id] = SelectionStatus.INDETERMINATE;

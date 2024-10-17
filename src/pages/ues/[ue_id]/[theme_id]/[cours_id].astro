@@ -4,7 +4,6 @@ import Layout from "@/layouts/Layout.astro";
 import MainHeader from "../../../../components/MainHeader.astro";
 import {defaultFilters} from "../../../../lib/qcmFilters";
 import QCMWrapper from "../../../../components/QCMWrapper.astro";
-import {padMultilineString} from "astro/dist/core/util";
 export function getStaticPaths() {
     // for each ue and theme and cours pair
     return arborescence_cours.flatMap((ue) => {
@@ -30,7 +29,7 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
             <div class="card mb-3" id={fiche.id}>
                 <div class="card-body d-flex flex-column justify-content-center align-content-center align-items-center py-2">
                     <a href={fiche.download_url}
-                       class="btn btn-primary btn-mg btn-block w-auto my-3">Télécharger {fiche.name}</a>
+                       class="btn btn-primary btn-mg btn-block my-3 btn-download"><mark class="text-info text-bg-primary">Télécharger</mark> {fiche.name}</a>
                     <a data-modal-id={`#modal-${fiche.id}`}
                        class="btn btn-outline-primary d-inline-block mx-auto">
                         Afficher l'aperçu du PDF
@@ -69,6 +68,9 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
 
 <style>
 
+    .btn-download {
+        width: 50%;
+    }
 
     .modal, .modal-dialog {
         max-width: unset !important;
@@ -86,6 +88,9 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
         .pdf-modal {
             width: 90vw;
             height: 90vh;
+        }
+        .btn-download {
+            width: auto;
         }
     }
 
@@ -118,8 +123,8 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
     const modalButtons = [...document.querySelectorAll('[data-modal-id]')]
     modalButtons.forEach(button => {
         button.addEventListener('click', () => {
-            let modal_id = button.dataset.modalId.slice(1);
-            const modal = modals[modal_id]
+            let modal_id = (button! as HTMLElement).dataset.modalId?.slice(1);
+            const modal = modal_id && modals[modal_id]
             if (modal) {
                 console.log(`showing ${modal}`)
                 modal.show()
@@ -138,6 +143,19 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
             const old = currentmodal
             currentmodal = null
             old.hide()
+        }
+    })
+
+    window.addEventListener('hashchange', () => {
+        if (!currentmodal) {
+            const url = new URL(document.location.toString())
+            let modal_id = url.hash.slice(1);
+            const modalElem = modals[modal_id]
+            if (modalElem) {
+                console.log(`showing ${modalElem}`)
+                modalElem.show()
+                currentmodal = modalElem
+            }
         }
     })
 

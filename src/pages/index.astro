@@ -1,6 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import MainHeader from "@/components/MainHeader.astro"
 import {Image} from "astro:assets"
 import faviconSrc from "@/layouts/favicon.png"
 ---
@@ -12,7 +11,8 @@ import faviconSrc from "@/layouts/favicon.png"
     <div class="d-flex flex-column d-md-grid flex-row gap-3" style="grid-template-rows: 1fr 1fr 0.25fr; grid-template-columns: 3fr 1fr">
 
         <div class="text-center m-1 mx-md-5" style=" grid-area: 1 / 1 / 3 / 2;">
-            <Image class="mb-2" src={faviconSrc} alt="logo principal" width="250rem"/>
+            <div>
+            <Image class="mb-2" src={faviconSrc} alt="logo principal" style="max-height: 20rem; object-fit: contain"/>
             <p>🎉 Bienvenue sur Medhi Souk ! 🎉</p>
             <p>Je suis ravi de vous présenter cette petite plateforme conçue pour vous accompagner tout au long de votre
                 année de DFSGM3 ! Ici, vous trouverez des fiches de cours complètes et mises à jour pour l’année
@@ -49,11 +49,11 @@ import faviconSrc from "@/layouts/favicon.png"
 
         </div>
 
-        <div class="border border-2 p-2 " style="grid-area: 1 / 2 / 4 / 3;">
-            Bientot ici un historique des nouveautés
-        </div>
         <div class="border border-2 p-2" style="grid-area: 3 / 1 / 4 / 2;">
-            Bientot ici la tête de pierre
+            Bientôt ici la tête de Pierre
+        </div>
+        <div class="border border-2 p-2 " style="grid-area: 1 / 2 / 4 / 3;">
+            Bientôt ici un historique des nouveautés
         </div>
     </div>
 

@@ -4,6 +4,7 @@
     import 'iconify-icon'
     import {difficuly_map} from "@/lib/names.js";
     import DifficultyIcon from "@/components/DifficultyIcon.svelte";
+    import SvelteMarkdownBootstrap from "./SvelteMarkdownBootstrap.svelte"
 
     type OptionAnswer = number & { __brand: "OptionAnswer" };
     type TextAnswer = string & { __brand: "TextAnswer" };
@@ -179,14 +180,88 @@
 
 
     function getMatches(source: TextAnswer, possibilities: string[]) {
-        return possibilities.filter(p => p.toUpperCase() == source.toUpperCase())
+        return possibilities.filter(p => p.toUpperCase().trim() == source.toUpperCase().trim())
     }
 
-    let questionTextRef: HTMlElement;
+    let questionTextRef: HTMLElement;
 
     $: isAnswerChosen = answers[current_question] && answers[current_question] !== "";
-</script>
 
+
+    import Particles, {particlesInit} from '@tsparticles/svelte';
+    import type {ParticlesProps} from "@tsparticles/svelte/dist/Particles.svelte";
+    import {loadConfettiPreset} from "@tsparticles/preset-confetti";
+
+    const particlesConfig: ParticlesProps["options"] = {
+        emitters: [{
+            "life": {
+                "count": 4,
+                "duration": 0.1,
+                "delay": 0.4
+            },
+            "rate": {
+                "delay": 0.1,
+                "quantity": 150
+            },
+            "size": {
+                "width": 50,
+                "height": 50
+            }
+        }
+        ],
+        preset: "confetti"
+    }
+
+    let quitConfirm: HTMLButtonElement;
+
+    void particlesInit(async (engine) => {
+        // call this once per app
+        // you can use main to customize the tsParticles instance adding presets or custom shapes
+        // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
+        // starting from v2 you can add only the features you need reducing the bundle size
+        //await loadFull(engine);
+        await loadConfettiPreset(engine);
+    });
+
+
+    function QCMHandler(e: KeyboardEvent) {
+        if (questions[current_question]?.type !== "choices") {
+            return
+        }
+        if (e.key === "Enter" && current_question < questions.length - 1) {
+            nextQuestion()
+        }
+        if (e.key === "Backspace" && current_question > 0) {
+            previousQuestion()
+        }
+        if (e.key === "Escape") {
+            quitConfirm.click();
+        }
+        let toclick = null;
+        if (e.key === "a") {
+            toclick = document.getElementById(`option-0`)
+        }
+        if (e.key === "z") {
+            toclick = document.getElementById(`option-1`)
+        }
+        if (e.key === "e") {
+            toclick = document.getElementById(`option-2`)
+        }
+        if (e.key === "r") {
+            toclick = document.getElementById(`option-3`)
+        }
+        toclick?.click();
+        toclick?.blur();
+    }
+
+    onMount(() => {
+        window.addEventListener("keydown", QCMHandler);
+        return () => window.removeEventListener("keydown", QCMHandler);
+    });
+
+
+</script>
+<button class="d-none" bind:this={quitConfirm} tabindex="-1" data-bs-target="#quitConfirm" data-bs-toggle="modal" ></button>
 <div aria-hidden="true" class="modal fade" id="quitConfirm" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-secondary">
@@ -240,7 +315,8 @@
 
                 <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-2">
                     <div>
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le
+                        <button class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#quitConfirm">Quitter le
                             QCM
                         </button>
                     </div>
@@ -260,49 +336,58 @@
                     </div>
                 </div>
 
-                <div class="p-0 m-0" bind:this={questionTextRef}>
-                    <p class=" d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
-                       style="min-height: 4.5rem">{questions[current_question].text}</p>
+                <div class="p-0 m-0" style="min-height: 35rem">
+                    <div class="p-0 m-0" bind:this={questionTextRef}>
+                        <SvelteMarkdownBootstrap ignore={["list"]}
+                                                 class="d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
+                                                 source={questions[current_question].text} style="min-height: 6rem"/>
+                        <SvelteMarkdownBootstrap ignore={["list"]}
+                                                 class="d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
+                                                 source={questions[current_question].text} style="min-height: 5.8rem"/>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center">
+                        {#if questions[current_question].type === 'choices'}
 
-
-                    <p class=" d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
-                       style="min-height: 5.8rem">{questions[current_question].text}</p>
-                </div>
-                <div style="min-height: 30rem">
-                {#if questions[current_question].type === 'choices'}
-                    <fieldset class="answers-field d-flex flex-column justify-content-evenly h-100" style="min-height: 100%">
-                        {#each questions[current_question].options as option, index}
-                            <div class="form-check my-3 h-25 d-flex align-items-baseline gap-1">
-                                <input
-                                        type="checkbox"
-                                        class=form-check-input
-                                        id="option-{index}"
-                                        name="question-{current_question}"
-                                        value={index}
-                                        checked={answers[current_question]?.includes(index)}
-                                        on:change={(e) => handleOptionChange(index, e)}
-                                />
-                                <label for="option-{index}"
-                                       class="d-none d-md-block fs-3 form-check-label text-primary-emphasis">{option.text}</label>
-                                <label for="option-{index}"
-                                       class="d-md-none form-check-label fs-5 text-primary-emphasis"
-                                       style="min-height: 6rem">{option.text}</label>
-                            </div>
-                        {/each}
-                    </fieldset>
-                {:else if questions[current_question].type === 'text'}
-                    <!-- svelte-ignore a11y-autofocus -->
-                    <input
-                            class="form-control border border-1 border-primary my-5"
-                            type="text"
-                            autofocus
-                            value={answers[current_question]}
-                            on:input={handleTextChange}
-                            placeholder="Votre réponse"
-                    />
-                {/if}
+                            <fieldset class="answers-field d-flex flex-column justify-content-evenly h-100"
+                                      style="min-height: 100%">
+                                {#each questions[current_question].options as option, index}
+                                    <div class="form-check my-3 h-25 d-flex align-items-baseline gap-3">
+                                        <input
+                                                type="checkbox"
+                                                class=form-check-input
+                                                id="option-{index}"
+                                                name="question-{current_question}"
+                                                value={index}
+                                                checked={answers[current_question]?.includes(index)}
+                                                on:change={(e) => handleOptionChange(index, e)}
+                                        />
+                                        <label for="option-{index}"
+                                               class="d-none d-md-block fs-3 form-check-label text-primary-emphasis">{option.text}</label>
+                                        <label for="option-{index}"
+                                               class="d-md-none form-check-label fs-5 text-primary-emphasis"
+                                               style="min-height: 6rem">{option.text}</label>
+                                    </div>
+                                {/each}
+                            </fieldset>
+                        {:else if questions[current_question].type === 'text'}
+                            <!-- svelte-ignore a11y-autofocus -->
+                            <input
+                                    class="form-control border border-1 border-primary my-0 "
+                                    type="text"
+                                    autofocus
+                                    value={answers[current_question]}
+                                    on:input={handleTextChange}
+                                    placeholder="Votre réponse"
+                            />
+                        {/if}
+                    </div>
                 </div>
             {:else}
+                {@const points = Number(points.reduce((a, b) => a + b).toFixed(2))}
+                {@const maxPoints = questions.length}
+                {#if points === maxPoints}
+                    <Particles options={particlesConfig}/>
+                {/if}
                 <div class="d-flex flex-row gap-2 align-items-center">
                     <h2 class="my-2 fs-3">Résultats</h2>
                     {#if save_answers}
@@ -311,15 +396,15 @@
                     {/if}
                 </div>
                 <h1 class="my-2" style="font-size:30pt">
-                    Note: {Number(points.reduce((a, b) => a + b).toFixed(2))}/{questions.length}
+                    Note: {points}/{maxPoints}
                 </h1>
                 <hr class="my-3"/>
                 {#each questions as question, index}
                     {@const qt_pts = points[index] || 0}
                     <div class="question-result">
-                        <p class="text-primary-emphasis fs-2 fw-bold question-response-text">{index + 1}
-                            . {question.text}</p>
-
+                        <SvelteMarkdownBootstrap ignore={["list"]}
+                                                 class="text-primary-emphasis fs-2 fw-bold question-response-text"
+                                                 source={`${index + 1}. ${question.text}`}/>
                         <div class="d-flex flex-row gap-1 my-3 " style="margin-left: -0.25rem">
 
                             <DifficultyIcon
@@ -396,7 +481,8 @@
             {/if}
         </div>
         <hr class="my-0 my-md-4 d-none d-md-block"/>
-        <div class="mt-1 my-md-5 btn-holder d-flex justify-content-around align-self-end" >
+        <div class="mt-1 my-md-5 btn-holder d-grid justify-content-end align-self-end gap-5"
+             style="grid-template-columns: repeat(2,40%)">
             {#if current_question < questions.length}
                 <button id="button_block" class="btn btn-outline-primary" on:click={previousQuestion}
                         disabled={current_question === 0}>
@@ -410,7 +496,9 @@
                     <button class="btn btn-primary btn-outline-" on:click={nextQuestion}>Suivant</button>
                 {/if}
             {:else}
-                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM</button>
+                <button class="btn btn-danger " data-bs-toggle="modal" data-bs-target="#quitConfirm"
+                        style="grid-column: 2">Quitter le QCM
+                </button>
             {/if}
         </div>
     </div>

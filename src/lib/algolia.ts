@@ -3,7 +3,7 @@ import {algoliasearch} from "algoliasearch";
 import {ALGOLIA_APP_ID} from "astro:env/client";
 import {pagesIndexName} from "@/lib/pagesIndexName.ts";
 import type {AllCours, CoursId, FicheId, ThemeId, UeId} from "@/lib/files.ts";
-import {sortCollate, sortString} from "@/lib/locale.ts";
+import {sortString} from "@/lib/locale.ts";
 
 const client = algoliasearch(ALGOLIA_APP_ID, getSecret('ALGOLIA_API_KEY')!);
 
