@@ -42,7 +42,8 @@
         {#if token?.tokens?.length ?? 0 > 0}
             <svelte:self token={token.tokens} links={links}/>
         {:else}
-            {token.text}
+            <!-- make space before punctuation non breaking -->
+            {token.text.replace(/ ([,:?!/;.])/g, " $1")}
         {/if}
     {:else if token.type === "heading"}
         {#if (token.depth === 1)}

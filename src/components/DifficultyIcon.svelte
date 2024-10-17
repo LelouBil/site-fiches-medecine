@@ -14,8 +14,8 @@
     // noinspection ReservedWordAsName
     export {clazz as class}
 
-    const diffValues = difficuly_map[difficulty]
-    console.log("difficulty: ", difficulty, "diffValues: ", diffValues)
+    let diffValues: (typeof difficuly_map)["easy"]
+    $: diffValues = difficuly_map[difficulty]
 </script>
 <iconify-icon icon={diffValues.icon} class={(color_class || diffValues.color_class) + " " + clazz}
               width={width} height={height} title={title || null} inline={inline || null}></iconify-icon>

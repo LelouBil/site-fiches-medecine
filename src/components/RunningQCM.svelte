@@ -331,12 +331,12 @@
                         </p>
                         <DifficultyIcon
                                 difficulty={questions[current_question].difficulty}
-                                title={`Question ${difficuly_map[questions[current_question].difficulty].name}`}
+                                title={`Question ${diffvalues.name}`}
                         />
                     </div>
                 </div>
 
-                <div class="p-0 m-0" style="min-height: 35rem">
+                <div class="p-0 m-0 d-flex flex-column main-block">
                     <div class="p-0 m-0" bind:this={questionTextRef}>
                         <SvelteMarkdownBootstrap ignore={["list"]}
                                                  class="d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
@@ -345,7 +345,7 @@
                                                  class="d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
                                                  source={questions[current_question].text} style="min-height: 5.8rem"/>
                     </div>
-                    <div class="d-flex flex-column justify-content-center">
+                    <div class="d-flex flex-column justify-content-center flex-grow-1">
                         {#if questions[current_question].type === 'choices'}
 
                             <fieldset class="answers-field d-flex flex-column justify-content-evenly h-100"
@@ -383,9 +383,9 @@
                     </div>
                 </div>
             {:else}
-                {@const points = Number(points.reduce((a, b) => a + b).toFixed(2))}
+                {@const totalPoints = Number(points.reduce((a, b) => a + b).toFixed(2))}
                 {@const maxPoints = questions.length}
-                {#if points === maxPoints}
+                {#if totalPoints === maxPoints}
                     <Particles options={particlesConfig}/>
                 {/if}
                 <div class="d-flex flex-row gap-2 align-items-center">
@@ -396,7 +396,7 @@
                     {/if}
                 </div>
                 <h1 class="my-2" style="font-size:30pt">
-                    Note: {points}/{maxPoints}
+                    Note: {totalPoints}/{maxPoints}
                 </h1>
                 <hr class="my-3"/>
                 {#each questions as question, index}
@@ -416,9 +416,7 @@
                                     class:text-success={qt_pts === 1}
                                     class:text-warning={qt_pts > 0 && qt_pts < 1}
                                     class:text-danger={qt_pts === 0}
-                            >
-
-                            Points&thinsp;: {qt_pts}</span>
+                            >Points&thinsp;: {qt_pts}</span>
                         </div>
                         {#if question.type === 'choices'}
                             <div class="d-flex gap-3 flex-column">
@@ -481,7 +479,7 @@
             {/if}
         </div>
         <hr class="my-0 my-md-4 d-none d-md-block"/>
-        <div class="mt-1 my-md-5 btn-holder d-grid justify-content-end align-self-end gap-5"
+        <div class="mt-1 my-md-5 btn-holder d-grid justify-content-around justify-content-md-end align-self-end gap-5"
              style="grid-template-columns: repeat(2,40%)">
             {#if current_question < questions.length}
                 <button id="button_block" class="btn btn-outline-primary" on:click={previousQuestion}
@@ -557,6 +555,16 @@
 
         .answer-fontsize {
             font-size: 1rem;
+        }
+    }
+
+    .main-block {
+        min-height: 90vh
+    }
+
+    @media screen and (min-width: 768px) {
+        .main-block {
+            min-height: 35rem;
         }
     }
 </style>

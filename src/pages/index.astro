@@ -2,59 +2,94 @@
 import Layout from "../layouts/Layout.astro";
 import {Image} from "astro:assets"
 import faviconSrc from "@/layouts/favicon.png"
+import pierreSrc from "@/layouts/pierre.jpg"
 ---
 
 <Layout title="Accueil">
-    <!--<MainHeader><p>Accueil</p></MainHeader>-->
 
+    <div class="d-flex flex-column d-md-grid flex-row gap-3"
+         style="grid-template-rows: 1fr 1fr 1fr; grid-template-columns: 1fr 1fr 0.8fr">
 
-    <div class="d-flex flex-column d-md-grid flex-row gap-3" style="grid-template-rows: 1fr 1fr 0.25fr; grid-template-columns: 3fr 1fr">
+        <div class="text-center m-1 mx-md-5" style=" grid-area: 1 / 1 / 3 / 3;">
+            <div class="mx-md-5">
+                <Image class="mb-2" src={faviconSrc} alt="logo principal"
+                       style="max-height: 20rem; object-fit: contain"/>
+                <h5>🎉 Bienvenue sur Medhi Souk ! 🎉</h5>
+                <p>Je suis ravi de vous présenter cette petite plateforme conçue pour vous accompagner tout au long de
+                    votre
+                    année de <strong>DFSGM3</strong> ! Ici, vous trouverez des <strong>fiches de cours
+                        complètes</strong> et mises à jour pour l’année
+                    2024-2025,
+                    ainsi que des <strong>QCM inédits</strong> créés spécialement pour renforcer vos connaissances.</p>
+                <p>🔍 <strong>Attention</strong>, cette plateforme n’a pas vocation à remplacer les cours officiels, les
+                    diapositives des
+                    professeurs
+                    ou les cours de l’association étudiante Ronéo. Elle est plutôt un outil de <strong>révision
+                        complémentaire</strong>,
+                    visant à
+                    vous aider à consolider vos apprentissages. Et entre nous, je tiens à préciser que l'intégralité des
+                    cours ne
+                    sera peut-être pas disponible avant chaque contrôle continu (eh oui, je suis tout seul à gérer ça,
+                    et le
+                    sommeil
+                    reste une priorité 😅).</p>
+                <p>🔔 <strong>Note importante</strong> : étant donné la quantité et la densité des contenus, il se peut
+                    que des petites
+                    erreurs
+                    (orthographe, syntaxe ou même des infos) se glissent ici ou là. Si vous en repérez, n'hésitez
+                    surtout
+                    pas à me
+                    les signaler sur les réseaux, je corrigerai le tout rapidement pour que tout reste aussi précis que
+                    possible.</p>
+                <p>🔄 Des mises à jour régulières seront effectuées, avec de nouvelles fiches, des corrections, et
+                    peut-être
+                    même
+                    quelques <strong>nouvelles fonctionnalités</strong> ! Un <strong>historique des nouveautés</strong>
+                    est disponible juste a coté
+                    pour
+                    que vous
+                    restiez informés.</p>
+                <p>💡 Un dernier point : cette plateforme est <strong>100% gratuite</strong>, sans publicité, ni stockage
+                    de données
+                    personnelles, et
+                    <strong>aucune inscription n'est requise</strong> (Non, vous n'êtes pas le produit 😉). Elle est
+                    dédiée aux étudiants
+                    de
+                    la
+                    faculté de médecine de <strong>KB</strong>, donc je compte sur vous pour en faire bon usage et
+                    rester respectueux !
+                    🙏
+                    <strong>Vous êtes les meilleurs !</strong></p>
+                Un grand merci à mes collaborateurs <strong>LelouBil</strong> et <strong>Tyranozomby</strong> pour la
+                programmation.
+                <p><em>Pierre MARTINI</em></p>
 
-        <div class="text-center m-1 mx-md-5" style=" grid-area: 1 / 1 / 3 / 2;">
-            <div>
-            <Image class="mb-2" src={faviconSrc} alt="logo principal" style="max-height: 20rem; object-fit: contain"/>
-            <p>🎉 Bienvenue sur Medhi Souk ! 🎉</p>
-            <p>Je suis ravi de vous présenter cette petite plateforme conçue pour vous accompagner tout au long de votre
-                année de DFSGM3 ! Ici, vous trouverez des fiches de cours complètes et mises à jour pour l’année
-                2024-2025,
-                ainsi que des QCM inédits créés spécialement pour renforcer vos connaissances.</p>
-            <p>🔍 Attention, cette plateforme n’a pas vocation à remplacer les cours officiels, les diapositives des
-                professeurs
-                ou les cours de l’association étudiante Ronéo. Elle est plutôt un outil de révision complémentaire,
-                visant à
-                vous aider à consolider vos apprentissages. Et entre nous, je tiens à préciser que l'intégralité des
-                cours ne
-                sera peut-être pas disponible avant chaque contrôle continu (eh oui, je suis tout seul à gérer ça, et le
-                sommeil
-                reste une priorité 😅).</p>
-            <p>🔔 Note importante : étant donné la quantité et la densité des contenus, il se peut que des petites
-                erreurs
-                (orthographe, syntaxe ou même des infos) se glissent ici ou là. Si vous en repérez, n'hésitez surtout
-                pas à me
-                les signaler sur les réseaux, je corrigerai le tout rapidement pour que tout reste aussi précis que
-                possible.</p>
-            <p>🔄 Des mises à jour régulières seront effectuées, avec de nouvelles fiches, des corrections, et peut-être
-                même
-                quelques nouvelles fonctionnalités ! Un historique des nouveautés est disponible juste au-dessus pour
-                que vous
-                restiez informés.</p>
-            <p>💡 Un dernier point : cette plateforme est 100% gratuite, sans publicité, ni stockage de données
-                personnelles, et
-                aucune inscription n'est requise (Non, vous n'êtes pas le produit 😉). Elle est dédiée aux étudiants de
-                la
-                faculté de médecine de KB, donc je compte sur vous pour en faire bon usage et rester respectueux ! 🙏
-                Vous êtes les meilleurs !</p>
-            Un grand merci à mes collaborateurs LelouBil et Tyranozomby pour la programmation.
-            <p>Pierre MARTINI</p>
-
+            </div>
         </div>
-
-        <div class="border border-2 p-2" style="grid-area: 3 / 1 / 4 / 2;">
-            Bientôt ici la tête de Pierre
+        <div class=" d-grid gap-2 justify-content-center align-items-center border border-2 p-2"
+             style="grid-area: 3 / 2 / 4 / 2; grid-template-rows: 1fr 6fr">
+            <p class="text-center vertical-align-center mb-0">
+                Votre point de contact pour une question ou une correction
+            </p>
+            <div class="d-flex flex-row gap-3 mx-2">
+                <div class="d-flex align-items-center justify-content-center flex-column">
+                    <p> Pierre Martini</p>
+                    <p>Étudiant en DFGSM3</p>
+                    <a href="mailto:pmart2004@gmail.com?subject=%5BMEDHISOUK%5D%20">pierre.martini@gmail.com</a>
+                </div>
+                <img class="border border-primary border-3 justify-self-end" src={pierreSrc.src}
+                     style="aspect-ratio: 1; max-height: 10rem" alt="Photo de Pierre martini"/>
+            </div>
         </div>
-        <div class="border border-2 p-2 " style="grid-area: 1 / 2 / 4 / 3;">
+        <div class="border border-2 p-2 " style="grid-area: 1 / 3 / 4 / 4;">
             Bientôt ici un historique des nouveautés
         </div>
     </div>
 
 </Layout>
+
+<style>
+    strong {
+        font-weight: bold;
+    }
+</style>
