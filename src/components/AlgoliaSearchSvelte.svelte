@@ -36,6 +36,8 @@
     }
 
     let inputRef: HTMLInputElement;
+    let formRef: HTMLFormElement;
+    let panelRef: HTMLElement;
 
     const searchClient = algoliaSearch(
         ALGOLIA_APP_ID,
@@ -89,6 +91,40 @@
         });
     }
 
+
+
+
+    let cleanupEvents: () => void | null = null;
+    $: {
+        autocompleteState.isOpen;
+        cleanupEvents?.();
+        const environmentProps = autocomplete.getEnvironmentProps({formElement: formRef, inputElement: inputRef,panelElement: panelRef})
+        if (autocompleteState.isOpen) {
+            window.addEventListener("mousedown", environmentProps.onMouseDown)
+            window.addEventListener("touchmove", environmentProps.onTouchMove)
+            window.addEventListener("touchstart", environmentProps.onTouchStart)
+        }
+        cleanupEvents = () => {
+            window.removeEventListener("mousedown", environmentProps.onMouseDown)
+            window.removeEventListener("touchmove", environmentProps.onTouchMove)
+            window.removeEventListener("touchstart", environmentProps.onTouchStart)
+        };
+    }
+
+    onMount(() => {
+        console.log(`mounted ${formRef} ${inputRef} ${panelRef}`)
+        const environmentProps = autocomplete.getEnvironmentProps({formElement: formRef, inputElement: inputRef,panelElement: panelRef})
+        window.addEventListener("mousedown", environmentProps.onMouseDown)
+        window.addEventListener("touchmove", environmentProps.onTouchMove)
+        window.addEventListener("touchstart", environmentProps.onTouchStart)
+
+        cleanupEvents = () => {
+            window.removeEventListener("mousedown", environmentProps.onMouseDown)
+            window.removeEventListener("touchmove", environmentProps.onTouchMove)
+            window.removeEventListener("touchstart", environmentProps.onTouchStart)
+        };
+    })
+
 </script>
 {#if autocomplete}
     {@const inputProps = autocomplete.getInputProps({inputElement: inputRef})}
@@ -97,6 +133,7 @@
     <div class="aa-Autocomplete" {...autocomplete.getRootProps({})}>
         <form
                 class="aa-Form"
+                bind:this={formRef}
                 {...formProps}
                 on:submit={formProps.onSubmit}
                 on:reset={formProps.onReset}
@@ -129,6 +166,7 @@
         <!--svelte-ignore a11y-no-noninteractive-element-interactions -->
         <!--svelte-ignore a11y-no-static-element-interactions -->
         <div class="aa-Panel p-2 z-3" {...panelProps}
+             bind:this={panelRef}
              class:aa-Panel--stalled={autocompleteState.status === "stalled"}
              on:mousedown={panelProps.onMouseDown}
              on:mouseleave={panelProps.onMouseLeave}

@@ -2,7 +2,8 @@ import type {z} from "zod"
 import {questionFileSchema, questionSchema} from "@/lib/questionSchema";
 import * as drive from "@/lib/drive"
 import {buildPagesIndex} from "@/lib/algolia.ts";
-import 'es-iterator-helpers/auto'; // flatmap
+import 'es-iterator-helpers/auto';
+import {sortString} from "@/lib/locale.ts"; // flatmap
 
 
 export type ThemeId = string & {__brand: "ThemeID"}
@@ -64,7 +65,7 @@ export const all_types = new Set(all_questions.map(question => question.type))
 
 
 async function get_arborescence_cours(): Promise<AllCours> {
-    console.log("Reading drive")
+    console.log("----- Reading drive ----")
     const ues: UE[] = [];
     const ueFolders = await drive.files_in_folder(drive.ROOT_FOLDER_ID, drive.FilterType.Folders);
     if (ueFolders) {
@@ -72,13 +73,17 @@ async function get_arborescence_cours(): Promise<AllCours> {
             const themes: Themes[] = [];
             const themeFolders = await drive.files_in_folder(dossier_ue.id!, drive.FilterType.Folders);
             let ueId = normalizeName(dossier_ue.name) as UeId;
+            console.log(`UE: ${dossier_ue.name} (${ueId})`);
             if (themeFolders) {
                 for (const dossier_theme of themeFolders) {
                     const cours: Cours[] = [];
                     const coursFolders = await drive.files_in_folder(dossier_theme.id!, drive.FilterType.Folders);
                     let themeId = normalizeName(dossier_theme.name) as ThemeId;
+                    console.log(`Theme: ${dossier_theme.name} (${themeId})`);
                     if (coursFolders) {
                         for (const dossier_cours of coursFolders) {
+                            let coursId = normalizeName(dossier_cours.name) as CoursId;
+                            console.log(`Cours: ${dossier_cours.name} (${dossier_cours.id})`);
                             const fiches: Fiche[] = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
                                 ?.filter(file => file.fileExtension == "pdf")
                                 .map(fiche => ({
@@ -87,14 +92,29 @@ async function get_arborescence_cours(): Promise<AllCours> {
                                     download_url: fiche.webContentLink,
                                     embed_url: `https://drive.google.com/file/d/${fiche.id}/preview`
                                 }));
+                            for (const fiche of fiches) {
+                                console.log(`Fiche: ${fiche.name} (${fiche.id}) ${fiche.download_url}`)
+                            }
                             const questions_qcm = (await drive.files_in_folder(dossier_cours.id!, drive.FilterType.Files))
                                 ?.find(fiche => fiche.name == "questions.json");
-                            fiches.sort((a, b) => a.name.localeCompare(b.name));
+                            fiches.sort(sortString(fiche => fiche.name));
+
+                            let parse : z.infer<typeof questionFileSchema> | null = null;
                             if (questions_qcm) {
+                                console.log(`Questions for cours found: questions.json`);
                                 console.log(`Parsing ${dossier_ue.name}/${dossier_theme.name}/${dossier_cours.name}/questions.json`);
+
+                                let content = await drive.get_file_content(questions_qcm.id!);
+                                const attempt =
+                                    await questionFileSchema.safeParseAsync(content)
+                                if (attempt.success) {
+                                    parse = attempt.data;
+                                }else{
+                                    const error = attempt.error;
+                                    console.error(`Error parsing ${dossier_ue.name}/${dossier_theme.name}/${dossier_cours.name}/questions.json`);
+                                    console.error(error.toString())
+                                }
                             }
-                            const parse = questions_qcm ? questionFileSchema.parse(await drive.get_file_content(questions_qcm.id!)) : null;
-                            let coursId = normalizeName(dossier_cours.name) as CoursId;
                             const questions: FullQuestion[] = (parse?.questions ?? []).map(question => ({
                                 ...question,
                                 tags: new Set([...question.tags, ...(parse?.tags ?? [])]),
@@ -111,8 +131,10 @@ async function get_arborescence_cours(): Promise<AllCours> {
                                 });
                             }
                         }
+                    }else{
+                        console.log("No cours found")
                     }
-                    cours.sort((a, b) => a.name.localeCompare(b.name));
+                    cours.sort(sortString(cours => cours.name));
                     if (cours.length > 0) {
                         themes.push({
                             name: dossier_theme.name,
@@ -122,7 +144,10 @@ async function get_arborescence_cours(): Promise<AllCours> {
                     }
                 }
             }
-            themes.sort((a, b) => a.name.localeCompare(b.name));
+            else{
+                console.log("No theme found")
+            }
+            themes.sort(sortString(theme => theme.name));
             if(themes.length > 0) {
                 ues.push({
                     name: dossier_ue.name,
@@ -132,7 +157,10 @@ async function get_arborescence_cours(): Promise<AllCours> {
             }
         }
     }
-    ues.sort((a, b) => a.name.localeCompare(b.name));
+    else{
+        console.log("No UE found")
+    }
+    ues.sort(sortString(ue => ue.name));
     await buildPagesIndex(ues);
     return ues;
 }

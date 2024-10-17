@@ -2,8 +2,8 @@
     import {onMount} from "svelte";
     import type {FullQuestion} from "@/lib/files.ts";
     import 'iconify-icon'
-    import type {Difficulty} from "@/lib/questionSchema.ts";
-    import {questionDifficultyNames} from "@/lib/names.js";
+    import {difficuly_map} from "@/lib/names.js";
+    import DifficultyIcon from "@/components/DifficultyIcon.svelte";
 
     type OptionAnswer = number & { __brand: "OptionAnswer" };
     type TextAnswer = string & { __brand: "TextAnswer" };
@@ -100,41 +100,23 @@
             let int: NodeJS.Timeout | undefined = undefined;
             const timeStep = () => {
                 // if tab has focus
+                if (current_question >= questions.length) {
+                    clearInterval(int);
+                }
                 if (document.visibilityState === "visible") {
 
                     const currentStoredTime = localStorage.getItem("qcm_time") ?? "0";
                     const currentTime = JSON.parse(currentStoredTime);
                     localStorage.setItem("qcm_time", JSON.stringify(currentTime + 1));
                 }
-                console.log("interval",current_question,questions.length)
-                if (current_question >= questions.length) {
-                    clearInterval(int);
-                }
+                console.log("interval", current_question, questions.length)
+
             }
             int = setInterval(timeStep, 1000);
             return () => clearInterval(int);
         }
         return () => {
         };
-    }
-
-    const difficuly_map: { [diff in Difficulty]: { icon: string, color_class: string } } = {
-        easy: {
-            icon: "line-md:gauge-empty",
-            color_class: "text-success"
-        },
-        medium: {
-            icon: "line-md:gauge-low",
-            color_class: "text-warning"
-        },
-        hard: {
-            icon: "line-md:gauge",
-            color_class: "text-danger"
-        },
-        impossible: {
-            icon: "line-md:gauge-full-twotone",
-            color_class: "text-primary"
-        }
     }
 
     let points: number[] = []
@@ -178,18 +160,18 @@
         }
     }
 
-    function formatTime(seconds: number){
+    function formatTime(seconds: number) {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const sec = seconds % 60;
         let res = ""
-        if(hours > 0){
+        if (hours > 0) {
             res += `${hours}h `
         }
-        if(minutes > 0){
+        if (minutes > 0) {
             res += `${minutes}m `
         }
-        if(sec > 0){
+        if (sec > 0) {
             res += `${sec}s`
         }
         return res
@@ -216,9 +198,9 @@
                 Vous allez perdre vos réponses actuelles
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline-primary" data-bs-dismiss="modal" on:click={quitQCM} type="button">Quitter
+                <button class="btn btn-outline-danger" data-bs-dismiss="modal" on:click={quitQCM} type="button">Quitter
                 </button>
-                <button class="btn btn-primary" data-bs-dismiss="modal" type="button">Annuler</button>
+                <button class="btn btn-primary btn-outline-" data-bs-dismiss="modal" type="button">Annuler</button>
             </div>
         </div>
     </div>
@@ -238,192 +220,199 @@
                 <button class="btn btn-outline-success" data-bs-dismiss="modal" on:click={nextQuestion} type="button">
                     Valider
                 </button>
-                <button class="btn btn-primary" data-bs-dismiss="modal" type="button">Annuler</button>
+                <button class="btn btn-primary btn-outline-" data-bs-dismiss="modal" type="button">Annuler</button>
             </div>
         </div>
     </div>
 </div>
 
 {#if questions.length > 0}
-    <div>
-        {#if questions[current_question]}
-            {@const diffvalues = difficuly_map[questions[current_question].difficulty]}
-            <!--            <button class="btn-xs float-end btn btn-primary floatingButton z-1" on:click={() => {-->
-            <!--                questionTextRef.scrollIntoView(true);-->
-            <!--                console.log("scroll",questionTextRef)-->
-            <!--            }}>-->
-            <!--                <iconify-icon icon="mingcute:down-line" width="1.2rem" height="1.2rem" class="m-1 text-primary"></iconify-icon>-->
-            <!--            </button>-->
+    <div class="d-flex flex-column">
+        <div>
+            {#if questions[current_question]}
+                {@const diffvalues = difficuly_map[questions[current_question].difficulty]}
+                <!--            <button class="btn-xs float-end btn btn-primary floatingButton z-1" on:click={() => {-->
+                <!--                questionTextRef.scrollIntoView(true);-->
+                <!--                console.log("scroll",questionTextRef)-->
+                <!--            }}>-->
+                <!--                <iconify-icon icon="mingcute:down-line" width="1.2rem" height="1.2rem" class="m-1 text-primary"></iconify-icon>-->
+                <!--            </button>-->
 
-            <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-2">
-                <div>
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM
-                    </button>
-                </div>
-                <div class="progress flex-fill  border-primary border-1 border w-75" role="progressbar"
-                     aria-label="avancée dans les questions"
-                     aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}>
-                    <div class="progress-bar" style="width: {progressPercent}%"/>
-                </div>
-                <div class="d-flex flex-row gap-1">
-                    <p class="fw-bold fs-4 text-secondary my-0">Question <span
-                            class="text-info">{current_question + 1}</span> sur {questions.length}
-
-                    </p>
-                    <iconify-icon inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
-                                  title={`Question ${questionDifficultyNames[questions[current_question].difficulty]}`}
-                                  width="1.8rem" height="1.8rem"></iconify-icon>
-                </div>
-            </div>
-
-            <div class="p-0 m-0" bind:this={questionTextRef}>
-                <p class=" d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
-                   style="min-height: 4.5rem">{questions[current_question].text}</p>
-
-
-                <p class=" d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
-                   style="min-height: 5.8rem">{questions[current_question].text}</p>
-            </div>
-            {#if questions[current_question].type === 'choices'}
-                <fieldset class="answers-field">
-                    {#each questions[current_question].options as option, index}
-                        <div class="form-check my-3 h-25 d-flex align-items-baseline gap-1">
-                            <input
-                                    type="checkbox"
-                                    class=form-check-input
-                                    id="option-{index}"
-                                    name="question-{current_question}"
-                                    value={index}
-                                    checked={answers[current_question]?.includes(index)}
-                                    on:change={(e) => handleOptionChange(index, e)}
-                            />
-                            <label for="option-{index}"
-                                   class="d-none d-md-block fs-3 form-check-label text-primary-emphasis">{option.text}</label>
-                            <label for="option-{index}"
-                                   class="d-md-none form-check-label fs-5 text-primary-emphasis"
-                                   style="min-height: 6rem">{option.text}</label>
-                        </div>
-                    {/each}
-                </fieldset>
-            {:else if questions[current_question].type === 'text'}
-                <input
-                        class="form-control border border-1 border-primary my-5"
-                        type="text"
-                        value={answers[current_question]}
-                        on:input={handleTextChange}
-                        placeholder="Votre réponse"
-                />
-            {/if}
-        {:else}
-            <div class="d-flex flex-row gap-2 align-items-center">
-                <h2 class="my-2 fs-3">Résultats</h2>
-                {#if save_answers}
-                    <p class="text-secondary-emphasis mb-0" style="vertical-align: center">(Temps passé: {formatTime(JSON.parse(localStorage.getItem("qcm_time") ?? "0"))})</p>
-                {/if}
-            </div>
-            <h1 class="my-2" style="font-size:30pt">Note: {Number(points.reduce((a, b) => a + b).toFixed(2))}
-                /{questions.length}</h1>
-            <hr class="my-3"/>
-            {#each questions as question, index}
-                {@const diffvalues = difficuly_map[question.difficulty]}
-                {@const qt_pts = points[index] || 0}
-                <div class="question-result">
-                    <p class="text-primary-emphasis fs-2 fw-bold question-response-text">{index + 1}
-                        . {question.text}</p>
-
-                    <div class="d-flex flex-row gap-1 my-3 " style="margin-left: -0.25rem">
-
-                        <iconify-icon inline icon={diffvalues.icon} class={`${diffvalues.color_class}`}
-                                      title={`Question ${questionDifficultyNames[question.difficulty]}`}
-                                      width="1.8rem" height="1.8rem"></iconify-icon>
-                        <span
-                                class="fw-bolder fs-4"
-                                class:text-success={qt_pts === 1}
-                                class:text-warning={qt_pts > 0 && qt_pts < 1}
-                                class:text-danger={qt_pts === 0}
-                        >
-
-                            Points&thinsp;: {qt_pts}</span>
+                <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-2">
+                    <div>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le
+                            QCM
+                        </button>
                     </div>
-                    {#if question.type === 'choices'}
-                        <div class="d-flex gap-3 flex-column">
-                            {#each question.options.values() as answer, i}
-                                {@const correct = answer.correct}
-                                {@const checked = answers[index].includes(i)}
-                                <div class="form-check answer-fontsize">
-                                    <input class="form-check-input " type="checkbox" id="option-{i}"
-                                           checked={answers[index].includes(i)}
-                                           inert
-                                           class:bg-success={checked && correct}
-                                           class:bg-danger={checked && !correct}
-                                           class:bg-warning={!checked && correct}
-                                           class:bg-secondary={!checked && !correct}
-                                    >
-                                    <label
-
-                                            class:text-success={checked && correct}
-                                            class:text-danger={checked && !correct}
-                                            class:text-warning={!checked && correct}
-                                            class:text-secondary={!checked && !correct}
-
-                                            class="form-check-label fw-bold" style="pointer-events: none"
-                                            for="option-{i}"
-                                    >
-                                        <span class="font-monospace fw-bolder">{correct ? "[Vrai]" : "[Faux]"}</span>
-                                        {answer.text}
-                                    </label></div>
-                            {/each}
-                        </div>
-                    {:else if question.type === 'text'}
-                        {@const matches = getMatches(answers[index], question.answers)}
-                        <input
-                                disabled
-                                class="form-control border border-1 my-2"
-                                class:border-success={matches.length > 0}
-                                class:border-danger={matches.length === 0}
-                                type="text"
-                                value={answers[index]}
+                    <div class="progress flex-fill  border-primary border-1 border w-75" role="progressbar"
+                         aria-label="avancée dans les questions"
+                         aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}>
+                        <div class="progress-bar" style="width: {progressPercent}%"/>
+                    </div>
+                    <div class="d-flex flex-row gap-1">
+                        <p class="fw-bold fs-4 text-secondary my-0 text-nowrap">Question <span
+                                class="text-info">{current_question + 1}</span> sur {questions.length}
+                        </p>
+                        <DifficultyIcon
+                                difficulty={questions[current_question].difficulty}
+                                title={`Question ${difficuly_map[questions[current_question].difficulty].name}`}
                         />
-                        {#if matches.length > 0}
-                            <div>
-                                Correct: <span class="text-primary-emphasis fw-bolder">{matches[0]}</span>
-                            </div>
-                        {/if}
+                    </div>
+                </div>
 
-                        <ul class="list-group my-2">
-                            <li class="list-group-item border-primary-subtle fw-bold fs-5 text-primary-emphasis">
-                                Réponses valides
-                            </li>
-                            {#each question.answers as answer}
-                                <li class="list-group-item border-primary-subtle list-group-item-secondary"
-                                    class:list-group-item-success={matches.includes(answer)}
-                                >{answer}</li>
-                            {/each}
-                        </ul>
+                <div class="p-0 m-0" bind:this={questionTextRef}>
+                    <p class=" d-none d-md-block text-primary-emphasis fs-2 fw-bold mt-4 mb-2"
+                       style="min-height: 4.5rem">{questions[current_question].text}</p>
+
+
+                    <p class=" d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
+                       style="min-height: 5.8rem">{questions[current_question].text}</p>
+                </div>
+                <div style="min-height: 30rem">
+                {#if questions[current_question].type === 'choices'}
+                    <fieldset class="answers-field d-flex flex-column justify-content-evenly h-100" style="min-height: 100%">
+                        {#each questions[current_question].options as option, index}
+                            <div class="form-check my-3 h-25 d-flex align-items-baseline gap-1">
+                                <input
+                                        type="checkbox"
+                                        class=form-check-input
+                                        id="option-{index}"
+                                        name="question-{current_question}"
+                                        value={index}
+                                        checked={answers[current_question]?.includes(index)}
+                                        on:change={(e) => handleOptionChange(index, e)}
+                                />
+                                <label for="option-{index}"
+                                       class="d-none d-md-block fs-3 form-check-label text-primary-emphasis">{option.text}</label>
+                                <label for="option-{index}"
+                                       class="d-md-none form-check-label fs-5 text-primary-emphasis"
+                                       style="min-height: 6rem">{option.text}</label>
+                            </div>
+                        {/each}
+                    </fieldset>
+                {:else if questions[current_question].type === 'text'}
+                    <!-- svelte-ignore a11y-autofocus -->
+                    <input
+                            class="form-control border border-1 border-primary my-5"
+                            type="text"
+                            autofocus
+                            value={answers[current_question]}
+                            on:input={handleTextChange}
+                            placeholder="Votre réponse"
+                    />
+                {/if}
+                </div>
+            {:else}
+                <div class="d-flex flex-row gap-2 align-items-center">
+                    <h2 class="my-2 fs-3">Résultats</h2>
+                    {#if save_answers}
+                        <p class="text-secondary-emphasis mb-0" style="vertical-align: center">(Temps
+                            passé: {formatTime(JSON.parse(localStorage.getItem("qcm_time") ?? "0"))})</p>
                     {/if}
                 </div>
-            {/each}
-        {/if}
-    </div>
-    <hr class="my-0 my-md-4 d-none d-md-block"/>
-    <div class="mt-1 my-md-5 d-flex col btn-holder">
-        {#if current_question < questions.length}
-            <button id="button_block" class="btn btn-outline-primary" on:click={previousQuestion}
-                    disabled={current_question === 0}>
-                Précédent
-            </button>
-            {#if current_question === questions.length - 1}
+                <h1 class="my-2" style="font-size:30pt">
+                    Note: {Number(points.reduce((a, b) => a + b).toFixed(2))}/{questions.length}
+                </h1>
+                <hr class="my-3"/>
+                {#each questions as question, index}
+                    {@const qt_pts = points[index] || 0}
+                    <div class="question-result">
+                        <p class="text-primary-emphasis fs-2 fw-bold question-response-text">{index + 1}
+                            . {question.text}</p>
 
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitConfirm">Valider les
-                    réponses
-                </button>
-            {:else}
+                        <div class="d-flex flex-row gap-1 my-3 " style="margin-left: -0.25rem">
 
-                <button class="btn btn-primary" on:click={nextQuestion}>Suivant</button>
+                            <DifficultyIcon
+                                    difficulty={question.difficulty}
+                                    title={`Question ${difficuly_map[question.difficulty].name}`}
+                            />
+                            <span
+                                    class="fw-bolder fs-4"
+                                    class:text-success={qt_pts === 1}
+                                    class:text-warning={qt_pts > 0 && qt_pts < 1}
+                                    class:text-danger={qt_pts === 0}
+                            >
+
+                            Points&thinsp;: {qt_pts}</span>
+                        </div>
+                        {#if question.type === 'choices'}
+                            <div class="d-flex gap-3 flex-column">
+                                {#each question.options.values() as answer, i}
+                                    {@const correct = answer.correct}
+                                    {@const checked = answers[index].includes(i)}
+                                    <div class="form-check answer-fontsize">
+                                        <input class="form-check-input " type="checkbox" id="option-{i}"
+                                               checked={answers[index].includes(i)}
+                                               inert
+                                               class:bg-success={checked && correct}
+                                               class:bg-danger={checked && !correct}
+                                               class:bg-warning={!checked && correct}
+                                               class:bg-secondary={!checked && !correct}
+                                        >
+                                        <label
+
+                                                class:text-success={checked && correct}
+                                                class:text-danger={checked && !correct}
+                                                class:text-warning={!checked && correct}
+                                                class:text-secondary={!checked && !correct}
+
+                                                class="form-check-label fw-bold" style="pointer-events: none"
+                                                for="option-{i}"
+                                        >
+                                            <span class="font-monospace fw-bolder">{correct ? "[Vrai]" : "[Faux]"}</span>
+                                            {answer.text}
+                                        </label></div>
+                                {/each}
+                            </div>
+                        {:else if question.type === 'text'}
+                            {@const matches = getMatches(answers[index], question.answers)}
+                            <input
+                                    disabled
+                                    class="form-control border border-1 my-2"
+                                    class:border-success={matches.length > 0}
+                                    class:border-danger={matches.length === 0}
+                                    type="text"
+                                    value={answers[index]}
+                            />
+                            {#if matches.length > 0}
+                                <div>
+                                    Correct: <span class="text-primary-emphasis fw-bolder">{matches[0]}</span>
+                                </div>
+                            {/if}
+
+                            <ul class="list-group my-2">
+                                <li class="list-group-item border-primary-subtle fw-bold fs-5 text-primary-emphasis">
+                                    Réponses valides
+                                </li>
+                                {#each question.answers as answer}
+                                    <li class="list-group-item border-primary-subtle list-group-item-secondary"
+                                        class:list-group-item-success={matches.includes(answer)}
+                                    >{answer}</li>
+                                {/each}
+                            </ul>
+                        {/if}
+                    </div>
+                {/each}
             {/if}
-        {:else}
-            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM</button>
-        {/if}
+        </div>
+        <hr class="my-0 my-md-4 d-none d-md-block"/>
+        <div class="mt-1 my-md-5 btn-holder d-flex justify-content-around align-self-end" >
+            {#if current_question < questions.length}
+                <button id="button_block" class="btn btn-outline-primary" on:click={previousQuestion}
+                        disabled={current_question === 0}>
+                    Précédent
+                </button>
+                {#if current_question === questions.length - 1}
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitConfirm">Valider les
+                        réponses
+                    </button>
+                {:else}
+                    <button class="btn btn-primary btn-outline-" on:click={nextQuestion}>Suivant</button>
+                {/if}
+            {:else}
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#quitConfirm">Quitter le QCM</button>
+            {/if}
+        </div>
     </div>
 {:else}
     <p>No questions available.</p>

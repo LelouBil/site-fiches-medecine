@@ -3,6 +3,7 @@ import {algoliasearch} from "algoliasearch";
 import {ALGOLIA_APP_ID} from "astro:env/client";
 import {pagesIndexName} from "@/lib/pagesIndexName.ts";
 import type {AllCours, CoursId, FicheId, ThemeId, UeId} from "@/lib/files.ts";
+import {sortCollate, sortString} from "@/lib/locale.ts";
 
 const client = algoliasearch(ALGOLIA_APP_ID, getSecret('ALGOLIA_API_KEY')!);
 
@@ -66,10 +67,10 @@ export async function buildPagesIndex(data: AllCours) {
         }
     })
 
-    const sortedUEs = data.sort((a, b) => a.name.localeCompare(b.name))
-    const sortedThemes = sortedUEs.flatMap(ue => ue.themes.sort((a, b) => a.name.localeCompare(b.name)))
-    const sortedCours = sortedThemes.flatMap(theme => theme.cours.sort((a, b) => a.name.localeCompare(b.name)))
-    const sortedFiches = sortedCours.flatMap(cours => cours.fiches.sort((a, b) => a.name.localeCompare(b.name)))
+    const sortedUEs = data.sort(sortString(ue => ue.name))
+    const sortedThemes = sortedUEs.flatMap(ue => ue.themes.sort(sortString(theme => theme.name)))
+    const sortedCours = sortedThemes.flatMap(theme => theme.cours.sort(sortString(cours => cours.name)))
+    const sortedFiches = sortedCours.flatMap(cours => cours.fiches.sort(sortString(fiche => fiche.name)))
 
     await client.saveObjects({
         indexName: pagesIndexName,

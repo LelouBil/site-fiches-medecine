@@ -4,6 +4,7 @@ import Layout from "@/layouts/Layout.astro";
 import MainHeader from "../../../../components/MainHeader.astro";
 import {defaultFilters} from "../../../../lib/qcmFilters";
 import QCMWrapper from "../../../../components/QCMWrapper.astro";
+import {padMultilineString} from "astro/dist/core/util";
 export function getStaticPaths() {
     // for each ue and theme and cours pair
     return arborescence_cours.flatMap((ue) => {
@@ -30,12 +31,24 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
                 <div class="card-body d-flex flex-column justify-content-center align-content-center align-items-center py-2">
                     <a href={fiche.download_url}
                        class="btn btn-primary btn-mg btn-block w-auto my-3">Télécharger {fiche.name}</a>
-                    <details class="mb-3 justify-content-center text-center align-items-center" style="width: 100%">
-                        <summary class="d-inline-block mx-auto">Afficher l'aperçu du PDF</summary>
-                            <object data={fiche.embed_url} type="application/pdf" class="pdf-embed">
-                                <p>Impossible d'afficher l'apercu <a href={fiche.download_url}>Télécharger le PDF</a>.</p>
-                            </object>
-                    </details>
+                    <a data-modal-id={`#modal-${fiche.id}`}
+                       class="btn btn-outline-primary d-inline-block mx-auto">
+                        Afficher l'aperçu du PDF
+                    </a>
+
+                    <div tabindex="-1" class="modal fade" id={`modal-${fiche.id}`}>
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content p-0 m-0 pdf-modal  border border-primary border-5">
+                                <div class="modal-body p-0 m-0 w-100 h-100">
+                                    <object data={fiche.embed_url} type="application/pdf"
+                                            class="w-100 h-100">
+                                        <p>Impossible d'afficher l'apercu <a href={fiche.download_url}>Télécharger le
+                                            PDF</a>.</p>
+                                    </object>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
     ))}
@@ -43,9 +56,11 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
     <QCMWrapper
 
             defaultQuestionCount={10}
-            preSetFilters={{...defaultFilters,
-        context: `le cours`,
-        included_cours: new Set([cours.id])}}/>
+            preSetFilters={{
+                ...defaultFilters,
+                context: `le cours`,
+                included_cours: new Set([cours.id])
+            }}/>
 
     <div id="questions" class="mt-5">
         <!-- Future questions will be added here -->
@@ -54,21 +69,90 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
 
 <style>
 
-    .pdf-embed{
-        width: 100%;
-        display: block;
-        margin: auto;
-        max-width: 50rem;
+
+    .modal, .modal-dialog {
+        max-width: unset !important;
+        max-height: unset !important;
+        justify-content: center;
     }
 
-    .pdf-embed{
-        height: 30rem;
+    .pdf-modal {
+        width: 60vw;
+        height: 90vh;
     }
 
-    @media screen and (min-width: 768px) {
-        .pdf-embed {
-            height: 69.7rem;
+
+    @media screen and (max-width: 768px) {
+        .pdf-modal {
+            width: 90vw;
+            height: 90vh;
         }
     }
 
 </style>
+
+<script>
+
+    import {Modal} from 'bootstrap'
+
+
+    let currentmodal: Modal | null = null
+
+    // get all fiche- modal
+    const modalComps = [...document.querySelectorAll('.modal')]
+    modalComps.forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', () => {
+            if(currentmodal == null) return
+            const url = new URL(document.location.toString())
+            url.hash = ''
+            window.history.back()
+            currentmodal = null
+        })
+    })
+    const modals: {
+        [key: string]: Modal
+    } = modalComps.reduce((acc, modal) => Object.assign(acc, {[modal.id]: Modal.getOrCreateInstance(modal)}), {})
+
+
+    //get all modal buttons
+    const modalButtons = [...document.querySelectorAll('[data-modal-id]')]
+    modalButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            let modal_id = button.dataset.modalId.slice(1);
+            const modal = modals[modal_id]
+            if (modal) {
+                console.log(`showing ${modal}`)
+                modal.show()
+                const url = new URL(document.location.toString())
+                url.hash = modal_id
+                window.history.pushState({}, '', `${url}`)
+                currentmodal = modal
+            }
+        })
+    })
+
+    // popstate event
+    window.addEventListener('popstate', () => {
+        if (currentmodal) {
+            console.log(`hiding ${currentmodal}`)
+            const old = currentmodal
+            currentmodal = null
+            old.hide()
+        }
+    })
+
+    const url = new URL(document.location.toString())
+    let modal_id = url.hash.slice(1);
+    const modalElem = modals[modal_id]
+    if (modalElem) {
+        console.log(`showing ${modalElem}`)
+        modalElem.show()
+        window.history.replaceState({modal: modal_id}, '', `${url}`)
+        currentmodal = modalElem
+    } else {
+        window.history.replaceState({modal: null}, '', `${url}`)
+        currentmodal = null
+    }
+
+
+</script>

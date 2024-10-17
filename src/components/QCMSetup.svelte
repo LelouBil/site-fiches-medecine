@@ -13,7 +13,8 @@
     import RunningQCM from "@/components/RunningQCM.svelte";
     import {questionSchema} from "@/lib/questionSchema.js";
     import {z} from "zod";
-    import {questionDifficultyNames, questionTypeNames} from "@/lib/names.ts";
+    import {questions_map, difficuly_map} from "@/lib/names.ts";
+    import DifficultyIcon from "@/components/DifficultyIcon.svelte";
 
     export let all_questions: FullQuestion[];
     export let all_difficulty: Set<Difficulty>;
@@ -97,8 +98,8 @@
     $: {
         questions_count_preview = filterQuestions(all_questions, question_filters).length;
         // questions_count = Math.min(questions_count, questions_count_preview);
-        if(questions_count == 0){
-            questions_count = Math.min(defaultQuestionCount,questions_count_preview)
+        if (questions_count == 0) {
+            questions_count = Math.min(defaultQuestionCount, questions_count_preview)
         }
     }
 
@@ -181,7 +182,8 @@
 
         <div class="row g-3 align-items-center my-2">
             <div class="col-auto">
-                <label for="nombre_questions" class="form-label d-inline fs-4 fw-bold">Nombre de questions&nbsp;:</label>
+                <label for="nombre_questions" class="form-label d-inline fs-4 fw-bold">Nombre de
+                    questions&nbsp;:</label>
             </div>
             <div class="col-auto">
                 <input type="number" name="nombre_questions"
@@ -193,29 +195,32 @@
                        max={questions_count_preview}/>
             </div>
             <div class="col-auto">
-                <span class="form-text"
+                <span class="form-text fs-5 fw-bold"
                       class:text-danger={questions_count > questions_count_preview}
-                      class:fw-bold={questions_count > questions_count_preview}
-                      class:fs-5={questions_count > questions_count_preview}
-                      id="nombreHelpBlock">Nombre de question correspondants aux filtres: <mark class=" p-0 bg-secondary" class:fw-bolder={questions_count > questions_count_preview}>{questions_count_preview}</mark></span>
+                      id="nombreHelpBlock">Nombre de questions correspondants aux filtres&thinsp;: <mark
+                        class=" p-0 bg-secondary"
+                        class:fw-bolder={questions_count > questions_count_preview}>{questions_count_preview}</mark></span>
             </div>
         </div>
 
 
-        <div class="hstack my-3 align-items-stretch overflow-x-auto gap-2 fs-4 ">
-            <div class="card w-25 scroll-card">
+        <div class="d-grid my-3 align-items-stretch overflow-x-auto gap-2 fs-4"
+             style="grid-template: 40rem / 1fr 1fr 1fr">
+            <div class="card scroll-card w-100" id="tags_filter_card">
                 <div class="card-header"><h3 class="card-title text-center">Filtrer par tags</h3></div>
-                <div class="card-body">
+                <div class="card-body flex-fill h-100 overflow-y-auto w-100">
                     <TagsFilter dataset={all_tags} bind:included={question_filters.filtered_tags}
                                 bind:excluded={question_filters.excluded_tags}/>
                 </div>
             </div>
-            <div class="card scroll-card">
+            <div class="card scroll-card h-100">
                 <div class="card-header"><h3 class="card-title text-center">Filtres par difficulté et type</h3></div>
                 <div class="card-body">
                     <div class="mt-0">
                         <h3>Difficulté</h3>
                         {#each all_difficulty as difficulty}
+                            {@const diffvalues = difficuly_map[difficulty]}
+                            {@const included = question_filters.included_difficulty.has(difficulty)}
                             <div class="form-check form-switch">
                                 <input type="checkbox" class="form-check-input rounded-5" role="switch"
                                        name={difficulty} id={difficulty}
@@ -226,9 +231,15 @@
                                question_filters.included_difficulty = new Set(question_filters.included_difficulty.values().filter(d => d !== difficulty))
                            }
                        }}
-                                       checked={question_filters.included_difficulty.has(difficulty)}
-                                ><label for="{difficulty}" class="form-check-label">
-                                {questionDifficultyNames[difficulty]}
+                                       checked={included}
+                                ><label for="{difficulty}" class="d-flex flex-row gap-2 form-check-label"
+                                        class:opacity-50={!included}
+                                        class:text-decoration-line-through={!included}
+                                        style="width: fit-content">
+                                <DifficultyIcon difficulty={difficulty}/>
+                                <div>
+                                    {diffvalues.name}
+                                </div>
                             </label>
                             </div>
                         {/each}
@@ -248,49 +259,69 @@
                            }
                        }}
                                        checked={question_filters.included_type.has(type)}
-                                ><label for="{type}" class=form-check-label>{questionTypeNames[type]}</label>
+                                ><label for="{type}" class="d-flex flex-row gap-2 form-check-label"
+                                        class:opacity-50={!question_filters.included_type.has(type)}
+                                        class:text-decoration-line-through={!question_filters.included_type.has(type)}
+                                        style="width: fit-content">
+                                <iconify-icon inline icon={questions_map[type].icon} width="1.8rem" height="1.8rem" class="text-primary"></iconify-icon>
+                                <div>
+                                    {questions_map[type].name}
+                                </div>
+                            </label>
                             </div>
                         {/each}
                     </div>
                 </div>
             </div>
 
-            <div class="card scroll-card">
+            <div class="card scroll-card h-100">
                 <div class="card-header"><h3 class="card-title d-inline-block text-center">Filtrer par
-                    UE/Theme/Cours</h3></div>
-                <div class="card-body px-2 px-md-3 overflow-y-auto" style="height: 10rem">
+                    UE&thinsp;/&thinsp;Theme&thinsp;/&thinsp;Cours</h3></div>
+                <div class="card-body px-2 px-md-3 overflow-y-auto">
                     {#each arborescence_cours.filter(u => all_questions.some(q => q.ue_id === u.id)) as ue}
-                        <details class="list" open>
-                            <summary> <span class="form-check-inline"><input type="checkbox" class=form-check-input
-                                                                             on:change={(e) =>  setUE(ue.id,e.target?.checked)}
-                                                                             checked={ue_state_map[ue.id] === SelectionStatus.SELECTED || ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
-                                                                             indeterminate={ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
-                                                                             name={ue.id} id={ue.id}>
-                        <label for="{ue.id}" class="form-check-label">UE&nbsp;: {ue.name}</label></span></summary>
+                        <details class="list" open >
+                            <summary>
+                                <span class="ms-0"><input type="checkbox" class=form-check-input
+                                                          on:change={(e) =>  setUE(ue.id,e.target?.checked)}
+                                                          checked={ue_state_map[ue.id] === SelectionStatus.SELECTED || ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
+                                                          indeterminate={ue_state_map[ue.id] === SelectionStatus.INDETERMINATE}
+
+                                                          name={ue.id} id={ue.id}>
+                                    <label for="{ue.id}" class="form-check-label"
+                                           class:opacity-50={ue_state_map[ue.id] === SelectionStatus.UNSELECTED}
+                                           class:text-decoration-line-through={ue_state_map[ue.id] === SelectionStatus.UNSELECTED}
+                                    >UE&nbsp;: {ue.name}</label></span>
+                            </summary>
                             {#each ue.themes.filter(t => all_questions.some(q => q.theme_id === t.id)) as theme}
                                 <details>
-                                    <summary><span class="form-check-inline"><input type="checkbox"
-                                                                                    class="form-check-input"
-                                                                                    on:change={(e) => setTheme(theme.id,e.target?.checked)}
-                                                                                    name={theme.id}
-                                                                                    checked={theme_state_map[theme.id] === SelectionStatus.SELECTED || theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
-                                                                                    indeterminate={theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
-                                                                                    id={theme.id}><label
-                                            for="{theme.id}"
-                                            class="form-check-label">Thème&nbsp;: {theme.name}</label>
-                            </span>
+                                    <summary>
+                                        <span class="ms-0"><input type="checkbox"
+                                                                  class="form-check-input"
+                                                                  on:change={(e) => setTheme(theme.id,e.target?.checked)}
+                                                                  name={theme.id}
+                                                                  checked={theme_state_map[theme.id] === SelectionStatus.SELECTED || theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
+                                                                  indeterminate={theme_state_map[theme.id] === SelectionStatus.INDETERMINATE}
+                                                                  id={theme.id}><label
+                                                for="{theme.id}"
+                                                class="form-check-label"
+                                                class:opacity-50={theme_state_map[theme.id] === SelectionStatus.UNSELECTED}
+                                                class:text-decoration-line-through={theme_state_map[theme.id] === SelectionStatus.UNSELECTED}
+                                        >Thème&nbsp;: {theme.name}</label>
+                                        </span>
                                     </summary>
                                     {#each theme.cours.filter(c => all_questions.some(q => q.cours_id === c.id)) as cours}
-                                        <div>
-                                            <div class="form-check">
-                                                <input type="checkbox" name={cours.id} id={cours.id}
-                                                       class="form-check-input"
-                                                       on:change={(e) => setCours(cours.id,e.target?.checked)}
-                                                       checked={question_filters.included_cours.has(cours.id)}
+                                        <div class="form-check-inline ms-4">
+                                            <input type="checkbox" name={cours.id} id={cours.id}
+                                                   class="form-check-input ms-4"
 
-                                                ><label
-                                                    for="{cours.id}" class="form-check-label">{cours.name}</label>
-                                            </div>
+                                                   on:change={(e) => setCours(cours.id,e.target?.checked)}
+                                                   checked={question_filters.included_cours.has(cours.id)}
+
+                                            ><label
+                                                for="{cours.id}" class="form-check-label"
+                                                class:opacity-50={!question_filters.included_cours.has(cours.id)}
+                                                class:text-decoration-line-through={!question_filters.included_cours.has(cours.id)}
+                                        >{cours.name}</label>
                                         </div>
                                     {/each}
                                 </details>
@@ -307,7 +338,7 @@
                 on:click={prepareQCM}>
             {(questions_count_preview === 0) ? "Aucune question ne correspond au filtres" : (questions_count === 0 ? "Il faut choisir au moins une question" :
                 questions_count <= 0 || questions_count > questions_count_preview ? `Les filtres renseignés font moins de ${questions_count} questions` :
-                `Démarrer ${questions_count} questions`)}
+                    `Démarrer ${questions_count} questions`)}
         </button>
     {/if}
     {#if qcm_running}
@@ -328,10 +359,20 @@
         margin-right: 5px;
     }
 
+    /*!* Parce que Bootstrap fait chier par défaut *!*/
+    /*label {*/
+    /*    display: initial;*/
+    /*}*/
+
+    /* C'est chelou mais ça marche. Ça permet de faire descendre le overflow 🤷‍♂️ */
+    /*:global(#tags_filter_card div:has(table)) {*/
+    /*    height: 100%;*/
+    /*    overflow: auto;*/
+    /*}*/
 
     @media screen and (orientation: landscape) {
         .scroll-card {
-            flex: 1
+            flex-grow: 1
         }
     }
 

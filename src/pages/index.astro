@@ -1,11 +1,60 @@
 ---
-
 import Layout from "../layouts/Layout.astro";
 import MainHeader from "@/components/MainHeader.astro"
+import {Image} from "astro:assets"
+import faviconSrc from "@/layouts/favicon.png"
 ---
 
 <Layout title="Accueil">
-    <MainHeader><p>Accueil</p></MainHeader>
+    <!--<MainHeader><p>Accueil</p></MainHeader>-->
 
+
+    <div class="d-flex flex-column d-md-grid flex-row gap-3" style="grid-template-rows: 1fr 1fr 0.25fr; grid-template-columns: 3fr 1fr">
+
+        <div class="text-center m-1 mx-md-5" style=" grid-area: 1 / 1 / 3 / 2;">
+            <Image class="mb-2" src={faviconSrc} alt="logo principal" width="250rem"/>
+            <p>🎉 Bienvenue sur Medhi Souk ! 🎉</p>
+            <p>Je suis ravi de vous présenter cette petite plateforme conçue pour vous accompagner tout au long de votre
+                année de DFSGM3 ! Ici, vous trouverez des fiches de cours complètes et mises à jour pour l’année
+                2024-2025,
+                ainsi que des QCM inédits créés spécialement pour renforcer vos connaissances.</p>
+            <p>🔍 Attention, cette plateforme n’a pas vocation à remplacer les cours officiels, les diapositives des
+                professeurs
+                ou les cours de l’association étudiante Ronéo. Elle est plutôt un outil de révision complémentaire,
+                visant à
+                vous aider à consolider vos apprentissages. Et entre nous, je tiens à préciser que l'intégralité des
+                cours ne
+                sera peut-être pas disponible avant chaque contrôle continu (eh oui, je suis tout seul à gérer ça, et le
+                sommeil
+                reste une priorité 😅).</p>
+            <p>🔔 Note importante : étant donné la quantité et la densité des contenus, il se peut que des petites
+                erreurs
+                (orthographe, syntaxe ou même des infos) se glissent ici ou là. Si vous en repérez, n'hésitez surtout
+                pas à me
+                les signaler sur les réseaux, je corrigerai le tout rapidement pour que tout reste aussi précis que
+                possible.</p>
+            <p>🔄 Des mises à jour régulières seront effectuées, avec de nouvelles fiches, des corrections, et peut-être
+                même
+                quelques nouvelles fonctionnalités ! Un historique des nouveautés est disponible juste au-dessus pour
+                que vous
+                restiez informés.</p>
+            <p>💡 Un dernier point : cette plateforme est 100% gratuite, sans publicité, ni stockage de données
+                personnelles, et
+                aucune inscription n'est requise (Non, vous n'êtes pas le produit 😉). Elle est dédiée aux étudiants de
+                la
+                faculté de médecine de KB, donc je compte sur vous pour en faire bon usage et rester respectueux ! 🙏
+                Vous êtes les meilleurs !</p>
+            Un grand merci à mes collaborateurs LelouBil et Tyranozomby pour la programmation.
+            <p>Pierre MARTINI</p>
+
+        </div>
+
+        <div class="border border-2 p-2 " style="grid-area: 1 / 2 / 4 / 3;">
+            Bientot ici un historique des nouveautés
+        </div>
+        <div class="border border-2 p-2" style="grid-area: 3 / 1 / 4 / 2;">
+            Bientot ici la tête de pierre
+        </div>
+    </div>
 
 </Layout>
