@@ -261,7 +261,8 @@
 
 
 </script>
-<button class="d-none" bind:this={quitConfirm} tabindex="-1" data-bs-target="#quitConfirm" data-bs-toggle="modal" ></button>
+<button class="d-none" bind:this={quitConfirm} tabindex="-1" data-bs-target="#quitConfirm"
+        data-bs-toggle="modal"></button>
 <div aria-hidden="true" class="modal fade" id="quitConfirm" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-secondary">
@@ -312,7 +313,6 @@
                 <!--            }}>-->
                 <!--                <iconify-icon icon="mingcute:down-line" width="1.2rem" height="1.2rem" class="m-1 text-primary"></iconify-icon>-->
                 <!--            </button>-->
-
                 <div class="d-flex flex-column flex-md-row flex-md-row-reverse align-items-center gap-3 gap-md-2">
                     <div>
                         <button class="btn btn-danger" data-bs-toggle="modal"
@@ -388,12 +388,17 @@
                 {#if totalPoints === maxPoints}
                     <Particles options={particlesConfig}/>
                 {/if}
-                <div class="d-flex flex-row gap-2 align-items-center">
-                    <h2 class="my-2 fs-3">Résultats</h2>
-                    {#if save_answers}
-                        <p class="text-secondary-emphasis mb-0" style="vertical-align: center">(Temps
-                            passé: {formatTime(JSON.parse(localStorage.getItem("qcm_time") ?? "0"))})</p>
-                    {/if}
+                <div class="d-flex flex-row gap-2 align-items-center justify-content-between">
+                    <div class="my-1 d-flex gap-1 flex-row">
+                        <h2 class="my-0 fs-3">Résultats</h2>
+                        {#if save_answers}
+                            <p class="d-inline text-secondary-emphasis mb-0 text-nowrap" style="vertical-align: center">(Temps
+                                passé: {formatTime(JSON.parse(localStorage.getItem("qcm_time") ?? "0"))})</p>
+                        {/if}
+                    </div>
+                    <button class="btn btn-danger align-self-end" data-bs-toggle="modal" data-bs-target="#quitConfirm"
+                            style="grid-column: 2">Quitter le QCM
+                    </button>
                 </div>
                 <h1 class="my-2" style="font-size:30pt">
                     Note: {totalPoints}/{maxPoints}

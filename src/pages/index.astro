@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import {Image} from "astro:assets"
 import faviconSrc from "@/layouts/favicon.png"
 import pierreSrc from "@/layouts/pierre.jpg"
+import leloubilSrc from "@/layouts/LelouBil.png"
+import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
 ---
 
 <Layout title="Accueil">
@@ -29,7 +31,7 @@ import pierreSrc from "@/layouts/pierre.jpg"
                     visant à
                     vous aider à consolider vos apprentissages. Et entre nous, je tiens à préciser que l'intégralité des
                     cours ne
-                    sera peut-être pas disponible avant chaque contrôle continu (eh oui, je suis tout seul à gérer ça,
+                    sera peut-être pas disponible avant chaque contrôle contiarnu (eh oui, je suis tout seul à gérer ça,
                     et le
                     sommeil
                     reste une priorité 😅).</p>
@@ -62,29 +64,53 @@ import pierreSrc from "@/layouts/pierre.jpg"
                     <strong>Vous êtes les meilleurs !</strong></p>
                 Un grand merci à mes collaborateurs <strong>LelouBil</strong> et <strong>Tyranozomby</strong> pour la
                 programmation.
-                <p><em>Pierre MARTINI</em></p>
+                <!--<p><em>Pierre MARTINI</em></p>-->
 
             </div>
         </div>
-        <div class=" d-grid gap-2 justify-content-center align-items-center p-2"
+        <div class=" d-flex gap-4 flex-row justify-content-center justify-content-md-center align-items-center p-0"
              style="grid-area: 2 / 1 / 3 / 2; grid-template-rows: 1fr 1fr">
-            <div class="border border-2 border-info p-4" style="height: fit-content">
-                <p class="text-center vertical-align-center mb-0">
-                    Votre point de contact pour une question ou une correction
-                </p>
-                <div class="d-flex flex-row gap-3 mx-2">
-                    <div class="d-flex align-items-center justify-content-center flex-column">
-                        <p> Pierre Martini</p>
-                        <p>Étudiant en DFGSM3</p>
-                        <a href="mailto:pmart2004@gmail.com?subject=%5BMEDHISOUK%5D%20">pmart2004@gmail.com</a>
+            <div class="p-0" style="height: 100%">
+                <div class="card m-0 border border-1 border-primary" style="height: 100%">
+                    <img class="card-img-top" src={pierreSrc.src}
+                         style="aspect-ratio: 1; width: 14rem; height: 50%; object-fit: cover" alt="Photo de Pierre Martini"/>
+                    <div class="card-body bg-primary text-bg-primary">
+                        <h5 class="card-title"> Pierre Martini</h5>
+                        <p><em>Étudiant en DFGSM3</em></p>
+                        <a class="text-bg-primary" href="mailto:pmart2004@gmail.com?subject=%5BMEDHISOUK%5D%20">pmart2004@gmail.com</a>
                     </div>
-                    <img class="border border-primary border-3 justify-self-end" src={pierreSrc.src}
-                         style="aspect-ratio: 1; max-height: 10rem" alt="Photo de Pierre Martini"/>
+
+                </div>
+            </div>
+            <div class="p-0" style="height: 100%">
+                <div class="card m-0 border border-1 border-primary" style="height: 100%">
+                    <img class="card-img-top" src={leloubilSrc.src}
+                         style="aspect-ratio: 1; width: 14rem; height: 50%; object-fit: cover" alt="Photo de LelouBil"/>
+                    <div class="card-body bg-primary text-bg-primary">
+                        <h5 class="card-title">LelouBil</h5>
+                        <p>&nbsp;</p>
+                        <a class="text-bg-primary" href="https://github.com/LelouBil">LelouBil: GitHub</a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="p-0" style="height: 100%">
+                <div class="card m-0 border border-1 border-primary" style="height: 100%">
+                    <img class="card-img-top" src={tyranozombySrc.src}
+                         style="aspect-ratio: 1; width: 14rem; height: 50%; object-fit: cover" alt="Photo de LelouBil"/>
+                    <div class="card-body bg-primary text-bg-primary">
+                        <h5 class="card-title">Tyranozomby</h5>
+                        <p>&nbsp;</p>
+                        <a class="text-bg-primary" href="https://github.com/Tyranozomby">Tyranozomby: GitHub</a>
+                    </div>
+
                 </div>
             </div>
         </div>
-        <div class="border border-primary border-2 p-2 " style="grid-area: 1 / 2 / 3 / 3;">
-            Bientôt ici un historique des nouveautés
+        <div class="card border border-primary border-2 p-0" style="grid-area: 1 / 2 / 3 / 3;">
+            <div class="card-header bg-primary text-bg-primary">
+                <h5 class="card-title text-center vertical-align-center mb-0">Derniers ajouts</h5>
+            </div>
         </div>
     </div>
 </Layout>
@@ -92,5 +118,8 @@ import pierreSrc from "@/layouts/pierre.jpg"
 <style>
     strong {
         font-weight: bold;
+    }
+    .card .list-group-item {
+        background-color: #0d6efd;
     }
 </style>

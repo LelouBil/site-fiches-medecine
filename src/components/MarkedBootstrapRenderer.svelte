@@ -3,7 +3,11 @@
 
     export let token: Token | Token[];
     export let links: Links;
-
+    function decodeHtml(html: string) {
+        const txt = document.createElement("textarea");
+        txt.innerHTML = html;
+        return txt.value;
+    }
 </script>
 {#if Array.isArray(token)}
     {#each token as t}
@@ -43,11 +47,17 @@
             <svelte:self token={token.tokens} links={links}/>
         {:else}
             <!-- make space before punctuation non breaking -->
-            {token.text.replace(/ ([,:?!/;.])/g, " $1")}
+            {decodeHtml(token.text.replace(/ ([,:?!/;.])/g, " $1"))}
         {/if}
+    {:else if token.type === "html"}
+        <svelte:self token={token.tokens} links={links}/>
+    {:else if token.type === "link"}
+        <a class="link-info" href={token.href} target="_blank" rel="noopener noreferrer">
+            <svelte:self token={token.tokens} links={links}/>
+        </a>
     {:else if token.type === "heading"}
         {#if (token.depth === 1)}
-            <small class="fs-4 text-secondary-emphasis">{token.text}</small>
+            <small class="fs-4 text-secondary-emphasis"><svelte:self token={token.tokens} links={links}/></small>
         {/if}
     {:else}
         <pre>{JSON.stringify(token)}</pre>
