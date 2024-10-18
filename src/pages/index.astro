@@ -9,13 +9,13 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
 
 <Layout title="Accueil">
 
-    <div class="d-flex flex-column d-md-grid flex-row gap-3"
-         style="grid-template-rows: auto 16rem; grid-template-columns: 1fr 0.4fr">
+    <div class="d-flex flex-column d-xl-grid flex-row gap-3"
+         style="grid-template-rows: auto 16rem; grid-template-columns: 3fr 1fr">
 
-        <div class="text-center m-1 mx-md-5" style=" grid-area: 1 / 1 / 2 / 2;">
-            <div class="mx-md-5" style="height: fit-content">
+        <div class="text-center p-0 m-0 pe-5" style=" grid-area: 1 / 1 / 2 / 2;">
+            <div class="mx-md-0" style="width: 100%">
                 <Image class="mb-2" src={faviconSrc} alt="logo principal"
-                       style="max-height: 15rem; object-fit: contain"/>
+                       style="height: 15rem;width: 15rem; object-fit: contain"/>
                 <h5>🎉 Bienvenue sur Medhi Souk ! 🎉</h5>
                 <p>Je suis ravi de vous présenter cette petite plateforme conçue pour vous accompagner tout au long de
                     votre
@@ -62,28 +62,16 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
                     rester respectueux !
                     🙏
                     <strong>Vous êtes les meilleurs !</strong></p>
+                <p>
                 Un grand merci à mes collaborateurs <strong>LelouBil</strong> et <strong>Tyranozomby</strong> pour la
                 programmation.
-                <!--<p><em>Pierre MARTINI</em></p>-->
+                </p>
+                <p><em>Pierre MARTINI</em></p>
 
             </div>
         </div>
-        <div class=" d-flex gap-4 flex-row justify-content-center justify-content-md-center align-items-center p-0 overflow-x-scroll"
+        <div class=" d-flex gap-4 flex-wrap flex-row justify-content-center justify-content-md-center align-items-center p-0"
              style="grid-area: 2 / 1 / 3 / 2; grid-template-rows: 1fr 1fr; max-width: 100vw">
-            
-
-            <div class="p-0" style="height: 100%">
-                <div class="card m-0 border border-1 border-primary" style="height: 100%">
-                    <img class="card-img-top" src={leloubilSrc.src}
-                         style="aspect-ratio: 1; width: 14rem; height: 50%; object-fit: cover" alt="Photo de LelouBil"/>
-                    <div class="card-body bg-primary text-bg-primary">
-                        <h5 class="card-title">LelouBil</h5>
-                        <p>&nbsp;</p>
-                        <a class="text-bg-primary" href="https://github.com/LelouBil">LelouBil: GitHub</a>
-                    </div>
-
-                </div>
-            </div>
             <div class="p-0" style="height: 100%">
                 <div class="card m-0 border border-1 border-primary" style="height: 100%">
                     <img class="card-img-top" src={pierreSrc.src}
@@ -96,6 +84,19 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
 
                 </div>
             </div>
+
+            <div class="p-0" style="height: 100%">
+                <div class="card m-0 border border-1 border-primary" style="height: 100%">
+                    <img class="card-img-top" src={leloubilSrc.src}
+                         style="aspect-ratio: 1; width: 14rem; height: 50%; object-fit: cover" alt="Photo de LelouBil"/>
+                    <div class="card-body bg-primary text-bg-primary">
+                        <h5 class="card-title">LelouBil</h5>
+                        <p>&nbsp;</p>
+                        <a class="text-bg-primary" href="https://github.com/LelouBil">LelouBil: GitHub</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="p-0" style="height: 100%">
                 <div class="card m-0 border border-1 border-primary" style="height: 100%">
                     <img class="card-img-top" src={tyranozombySrc.src}
@@ -110,7 +111,7 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
             </div>
         </div>
         <div class="card border border-primary border-2 p-0" style="grid-area: 1 / 2 / 3 / 3;">
-            <div class="card-header bg-primary text-bg-primary">
+            <div class="card-header bg-primary text-bg-primary" style="word-wrap: normal">
                 <h5 class="card-title text-center vertical-align-center mb-0">Derniers ajouts</h5>
             </div>
         </div>

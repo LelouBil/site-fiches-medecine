@@ -225,33 +225,44 @@
 
 
     function QCMHandler(e: KeyboardEvent) {
-        if (questions[current_question]?.type !== "choices") {
-            return
+        const isQCM = questions[current_question]?.type === "choices";
+        const isText = questions[current_question]?.type === "text";
+        if (e.key === "Escape") {
+            quitConfirm.click();
         }
-        if (e.key === "Enter" && current_question < questions.length - 1) {
+        // if (questions[current_question]?.type !== "choices") {
+        //     return
+        // }
+        if (((isText && e.ctrlKey) || !isText) && e.key === "Enter" && current_question < questions.length - 1) {
             nextQuestion()
         }
         if (e.key === "Backspace" && current_question > 0) {
             previousQuestion()
         }
-        if (e.key === "Escape") {
-            quitConfirm.click();
+
+        if (isQCM) {
+            let toclick = null;
+            if (e.key === "a") {
+                toclick = document.getElementById(`option-0`)
+            }
+            if (e.key === "z") {
+                toclick = document.getElementById(`option-1`)
+            }
+            if (e.key === "e") {
+                toclick = document.getElementById(`option-2`)
+            }
+            if (e.key === "r") {
+                toclick = document.getElementById(`option-3`)
+            }
+            if (e.key === "t") {
+                toclick = document.getElementById(`option-4`)
+            }
+            if (e.key === "y") {
+                toclick = document.getElementById(`option-5`)
+            }
+            toclick?.click();
+            toclick?.blur();
         }
-        let toclick = null;
-        if (e.key === "a") {
-            toclick = document.getElementById(`option-0`)
-        }
-        if (e.key === "z") {
-            toclick = document.getElementById(`option-1`)
-        }
-        if (e.key === "e") {
-            toclick = document.getElementById(`option-2`)
-        }
-        if (e.key === "r") {
-            toclick = document.getElementById(`option-3`)
-        }
-        toclick?.click();
-        toclick?.blur();
     }
 
     onMount(() => {
@@ -345,13 +356,12 @@
                                                  class="d-md-none text-primary-emphasis fs-4 fw-bold mt-2 mb-2"
                                                  source={questions[current_question].text} style="min-height: 5.8rem"/>
                     </div>
-                    <div class="d-flex flex-column justify-content-center flex-grow-1">
+                    <div class="d-flex flex-column flex-grow-1 justify-content-center">
                         {#if questions[current_question].type === 'choices'}
-
-                            <fieldset class="answers-field d-flex flex-column justify-content-evenly h-100"
-                                      style="min-height: 100%">
+                            <fieldset class="answers-field d-flex flex-grow-1 flex-column justify-content-around"
+                                      style="height: 100%">
                                 {#each questions[current_question].options as option, index}
-                                    <div class="form-check my-3 h-25 d-flex align-items-baseline gap-3">
+                                    <div class="form-check my-3 d-flex align-items-baseline gap-3">
                                         <input
                                                 type="checkbox"
                                                 class=form-check-input
@@ -364,8 +374,7 @@
                                         <label for="option-{index}"
                                                class="d-none d-md-block fs-3 form-check-label text-primary-emphasis">{option.text}</label>
                                         <label for="option-{index}"
-                                               class="d-md-none form-check-label fs-5 text-primary-emphasis"
-                                               style="min-height: 6rem">{option.text}</label>
+                                               class="d-md-none form-check-label fs-5 text-primary-emphasis">{option.text}</label>
                                     </div>
                                 {/each}
                             </fieldset>
@@ -392,7 +401,8 @@
                     <div class="my-1 d-flex gap-1 flex-row">
                         <h2 class="my-0 fs-3">Résultats</h2>
                         {#if save_answers}
-                            <p class="d-inline text-secondary-emphasis mb-0 text-nowrap" style="vertical-align: center">(Temps
+                            <p class="d-inline text-secondary-emphasis mb-0 text-nowrap" style="vertical-align: center">
+                                (Temps
                                 passé: {formatTime(JSON.parse(localStorage.getItem("qcm_time") ?? "0"))})</p>
                         {/if}
                     </div>
@@ -564,12 +574,12 @@
     }
 
     .main-block {
-        min-height: 90vh
+        min-height: 35rem
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (max-width: 768px) {
         .main-block {
-            min-height: 35rem;
+            min-height: 90vh;
         }
     }
 </style>
