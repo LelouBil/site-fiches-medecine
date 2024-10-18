@@ -5,8 +5,8 @@ import faviconSrc from "@/layouts/favicon.png"
 import pierreSrc from "@/layouts/pierre.jpg"
 import leloubilSrc from "@/layouts/LelouBil.png"
 import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
-import {all_questions, arborescence_cours, Cours, Fiche, Theme, UE} from "../lib/files";
-import {number} from "zod";
+import {all_questions, arborescence_cours} from "../lib/files";
+import type {UE, Theme, Cours, Fiche} from "../lib/files";
 
 enum HistoryEventType {
     CREATION,
@@ -35,7 +35,7 @@ const all_events = arborescence_cours.flatMap(ue => {
     const evts: HistoryEvent[] = []
     evts.push({type: HistoryEventType.CREATION, date: ue.creation_date, item: ue, itemType: "UE"})
     // if modification is at least 5 minutes after creation
-    if(ue.creation_date.getTime() - ue.last_modification_date.getTime() > 5 * 60 * 1000) {
+    if (ue.creation_date.getTime() - ue.last_modification_date.getTime() > 5 * 60 * 1000) {
         evts.push({type: HistoryEventType.MODIFICATION, date: ue.last_modification_date, item: ue, itemType: "UE"})
     }
     return evts.concat(
@@ -43,7 +43,7 @@ const all_events = arborescence_cours.flatMap(ue => {
             const evts: HistoryEvent[] = []
             evts.push({type: HistoryEventType.CREATION, date: theme.creation_date, item: theme, itemType: "Theme"})
             // if modification is at least 5 minutes after creation
-            if(theme.creation_date.getTime() - theme.last_modification_date.getTime() > 5 * 60 * 1000) {
+            if (theme.creation_date.getTime() - theme.last_modification_date.getTime() > 5 * 60 * 1000) {
                 evts.push({
                     type: HistoryEventType.MODIFICATION,
                     date: theme.last_modification_date,
@@ -61,7 +61,7 @@ const all_events = arborescence_cours.flatMap(ue => {
                         itemType: "Cours"
                     })
                     // if modification is at least 5 minutes after creation
-                    if(cours.creation_date.getTime() - cours.last_modification_date.getTime() > 5 * 60 * 1000) {
+                    if (cours.creation_date.getTime() - cours.last_modification_date.getTime() > 5 * 60 * 1000) {
                         evts.push({
                             type: HistoryEventType.MODIFICATION,
                             date: cours.last_modification_date,
@@ -80,7 +80,7 @@ const all_events = arborescence_cours.flatMap(ue => {
                                     itemType: "Fiche"
                                 })
                                 // if modification is at least 5 minutes after creation
-                                if(
+                                if (
                                     fiche.creation_date.getTime() - fiche.last_modification_date.getTime() > 5 * 60 * 1000
                                 ) {
                                     evts.push({
@@ -122,8 +122,6 @@ const all_events = arborescence_cours.flatMap(ue => {
 const all_ues = arborescence_cours
 const all_themes = arborescence_cours.flatMap(ue => ue.themes)
 const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => theme.cours))
-
-
 ---
 
 <Layout title="Accueil">
@@ -235,48 +233,57 @@ const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => th
             <div class="card-header bg-primary text-bg-primary" style="word-wrap: normal">
                 <h5 class="card-title text-center vertical-align-center mb-0">Derniers changements</h5>
             </div>
-            <ul class="list-group list-group-flush overflow-y-auto" style="--bs-list-group-border-color: var(--bs-primary)">
+            <ul class="list-group list-group-flush overflow-y-auto"
+                style="--bs-list-group-border-color: var(--bs-primary)">
                 {
                     all_events.map(event => (
-                            <li class="list-group-item d-grid gap-1 p-0 vertical-align-center" style="grid-template-columns: 0.2fr 1fr">
+                            <li class="list-group-item d-grid gap-1 p-0 vertical-align-center"
+                                style="grid-template-columns: 0.2fr 1fr">
                                 <div class="p-2 m-0 border-1 border-end border-primary d-grid align-items-center">{event.date.toLocaleDateString()}</div>
                                 <p class="p-2 m-0">
                                     {event.itemType === "UE" ?
                                         (
                                                 <span>
                                                     {event.type === HistoryEventType.CREATION ? "Création de l'UE" : "Modification de l'UE"}
-                                                    <strong> <a target="_blank" href={`ues/${event.item.id}`}>{event.item.name}</a></strong>
+                                                    <strong> <a target="_blank"
+                                                                href={`ues/${event.item.id}`}>{event.item.name}</a></strong>
                                                 </span>
                                         )
                                         : event.itemType === "Theme" ?
                                             (
                                                     <span>
                                                     {event.type === HistoryEventType.CREATION ? "Création du thème" : "Modification du thème"}
-                                                        <strong> <a target="_blank" href={`ues/${all_ues.find(u => u.themes.includes(event.item))!.id}/${event.item.id}`}>{event.item.name}</a></strong>
+                                                        <strong> <a target="_blank"
+                                                                    href={`ues/${all_ues.find(u => u.themes.includes(event.item))!.id}/${event.item.id}`}>{event.item.name}</a></strong>
                                                 </span>
                                             )
                                             : event.itemType === "Cours" ?
                                                 (
                                                         <span>
                                                     {event.type === HistoryEventType.CREATION ? "Création du cours" : "Modification du cours"}
-                                                            <strong> <a target="_blank" href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.includes(event.item)))!.id}/${all_themes.find(t => t.cours.includes(event.item))!.id}/${event.item.id}`}>{event.item.name}</a></strong>
+                                                            <strong> <a target="_blank"
+                                                                        href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.includes(event.item)))!.id}/${all_themes.find(t => t.cours.includes(event.item))!.id}/${event.item.id}`}>{event.item.name}</a></strong>
                                                 </span>
                                                 )
                                                 : event.itemType === "Fiche" ?
                                                     (
                                                             <span>
                                                     {event.type === HistoryEventType.CREATION ? "Création de la fiche" : "Modification de la fiche"}
-                                                                <strong> <a target="_blank" href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.find(c => c.fiches.includes(event.item))))!.id}/${all_themes.find(t => t.cours.find(c => c.fiches.includes(event.item)))!.id}/${all_cours.find(c => c.fiches.includes(event.item))!.id}#${event.item.id}`}>{event.item.name}</a></strong>
+                                                                <strong> <a target="_blank"
+                                                                            href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.find(c => c.fiches.includes(event.item))))!.id}/${all_themes.find(t => t.cours.find(c => c.fiches.includes(event.item)))!.id}/${all_cours.find(c => c.fiches.includes(event.item))!.id}#${event.item.id}`}>{event.item.name}</a></strong>
                                                 </span>
                                                     )
                                                     : event.itemType === "QuestionEditEvent" ?
                                                         (
                                                                 <span>
                                                     {event.type === HistoryEventType.CREATION ? (
-                                                                    <>Création de <strong>{event.item.questionCount} questions</strong></>)
-                                                        : (<><strong>Modification</strong> des questions</>)
+                                                                    <>Création de <strong>{event.item.questionCount}
+                                                                        questions</strong></>)
+                                                        : (
+                                                                    <><strong>Modification</strong> des questions</>)
                                                     }
-                                                                    pour le cours <strong> <a target="_blank" href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.find(c => c.id === event.item.cours.id)))!.id}/${all_themes.find(t => t.cours.find(c => c.id === event.item.cours.id))!.id}/${event.item.cours.id}`}>{event.item.cours.name}</a></strong>
+                                                                    pour le cours <strong> <a target="_blank"
+                                                                                              href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.find(c => c.id === event.item.cours.id)))!.id}/${all_themes.find(t => t.cours.find(c => c.id === event.item.cours.id))!.id}/${event.item.cours.id}`}>{event.item.cours.name}</a></strong>
                                                 </span>
                                                         )
                                                         : null
