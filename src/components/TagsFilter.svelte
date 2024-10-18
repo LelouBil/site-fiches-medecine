@@ -43,10 +43,7 @@
     }
 
     $: {
-        filteredTags = Array.from(dataset).filter(tag => norm(tag).includes(norm(search)) && !included.has(tag) && !excluded.has(tag));
-        if(search === "") {
-            filteredTags = filteredTags.sort(sortString(s => s))
-        }
+        filteredTags = Array.from(dataset).filter(tag => norm(tag).includes(norm(search)) && !included.has(tag) && !excluded.has(tag)).sort(sortString(s => s));
     }
 
 </script>
