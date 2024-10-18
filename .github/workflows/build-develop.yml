@@ -61,7 +61,7 @@ jobs:
             ${{ needs.deploy.outputs.url }}/ues
             ${{ needs.deploy.outputs.url }}/ues/nutrition
             ${{ needs.deploy.outputs.url }}/ues/nutrition/aspects-physiologiques-et-biochimiques
-            ${{ needs.deploy.outputs.url }}/ues/nutrition/aspects-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme
-            ${{ needs.deploy.outputs.url }}/ues/nutrition/aspects-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme#modal-nutrition-cours-1-vue-d-ensemble-du-metabolisme-pdf
+            ${{ needs.deploy.outputs.url }}/ues/nutrition/aspects-physiologiques-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme
+            ${{ needs.deploy.outputs.url }}/ues/nutrition/aspects-physiologiques-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme#nutrition-cours-1-vue-d-ensemble-du-metabolisme-pdf
           uploadArtifacts: true # save results as an action artifacts
           temporaryPublicStorage: true # upload lighthouse report to the temporary storage
