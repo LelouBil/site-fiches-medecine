@@ -126,7 +126,7 @@ const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => th
 
 <Layout title="Accueil">
 
-    <div class="d-flex flex-column d-xl-grid flex-row gap-3 main-content"
+    <div class="d-flex flex-column d-xl-grid flex-row gap-3"
          style="grid-template-rows: 1fr 16rem; grid-template-columns: 3fr 1fr">
 
         <div class="text-center p-0 m-0 pe-xl-5" style=" grid-area: 1 / 1 / 2 / 2;">
@@ -229,7 +229,7 @@ const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => th
                 </div>
             </div>
         </div>
-        <div class="card border border-primary border-2 p-0" style="grid-area: 1 / 2 / 3 / 3;">
+        <div class="card border border-primary border-2 p-0 main-content" style="grid-area: 1 / 2 / 3 / 3;">
             <div class="card-header bg-primary text-bg-primary" style="word-wrap: normal">
                 <h5 class="card-title text-center vertical-align-center mb-0">Derniers changements</h5>
             </div>
@@ -305,11 +305,4 @@ const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => th
     .main-content {
         max-height: 60rem;
     }
-
-    @media screen and (max-width: 768px) {
-        .main-content {
-            max-height: unset;
-        }
-    }
-
 </style>
