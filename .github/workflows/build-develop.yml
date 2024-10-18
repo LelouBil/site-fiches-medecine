@@ -56,12 +56,12 @@ jobs:
         uses: treosh/lighthouse-ci-action@v12
         with:
           urls: |
-            ${{ jobs.deploy.outputs.url }}
-            ${{ jobs.deploy.outputs.url }}/qcms
-            ${{ jobs.deploy.outputs.url }}/ues
-            ${{ jobs.deploy.outputs.url }}/ues/nutrition
-            ${{ jobs.deploy.outputs.url }}/ues/nutrition/aspects-physiologiques-et-biochimiques
-            ${{ jobs.deploy.outputs.url }}/ues/nutrition/aspect-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme
-            ${{ jobs.deploy.outputs.url }}/ues/nutrition/aspect-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme#modal-nutrition-cours-1-vue-d-ensemble-du-metabolisme-pdf
+            ${{ needs.jobs.deploy.outputs.url }}
+            ${{ needs.jobs.deploy.outputs.url }}/qcms
+            ${{ needs.jobs.deploy.outputs.url }}/ues
+            ${{ needs.jobs.deploy.outputs.url }}/ues/nutrition
+            ${{ needs.jobs.deploy.outputs.url }}/ues/nutrition/aspects-physiologiques-et-biochimiques
+            ${{ needs.jobs.deploy.outputs.url }}/ues/nutrition/aspect-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme
+            ${{ needs.jobs.deploy.outputs.url }}/ues/nutrition/aspect-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme#modal-nutrition-cours-1-vue-d-ensemble-du-metabolisme-pdf
           uploadArtifacts: true # save results as an action artifacts
           temporaryPublicStorage: true # upload lighthouse report to the temporary storage
