@@ -114,7 +114,7 @@
     function filterQuestions(questions: FullQuestion[], filters: QcmFilters): FullQuestion[] {
         return questions.filter(q => {
             return filters.included_cours.has(q.cours_id) &&
-                (filters.filtered_tags.size == 0 || filters.filtered_tags.values().some(t => q.tags.has(t))) &&
+                (filters.filtered_tags.size == 0 || filters.filtered_tags.values().every(t => q.tags.has(t))) &&
                 !filters.excluded_tags.values().some(t => q.tags.has(t)) &&
                 filters.included_difficulty.has(q.difficulty) &&
                 filters.included_type.has(q.type);

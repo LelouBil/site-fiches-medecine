@@ -1,5 +1,6 @@
 <script lang="ts">
     import type {QuestionTag} from "@/lib/questionSchema.ts";
+    import {sortString} from "@/lib/locale.ts";
 
     export let included: Set<QuestionTag>;
     export let excluded: Set<QuestionTag>;
@@ -41,7 +42,12 @@
             .toUpperCase()
     }
 
-    $: filteredTags = Array.from(dataset).filter(tag => norm(tag).includes(norm(search)) && !included.has(tag) && !excluded.has(tag));
+    $: {
+        filteredTags = Array.from(dataset).filter(tag => norm(tag).includes(norm(search)) && !included.has(tag) && !excluded.has(tag));
+        if(search === "") {
+            filteredTags = filteredTags.sort(sortString(s => s))
+        }
+    }
 
 </script>
 <div class="d-flex flex-column h-100 overflow-y-auto w-100">
@@ -88,7 +94,7 @@
                 <tbody>
                 {#each filteredTags as tag (tag)}
                     <tr class="">
-                        <td class=" py-0 align-middle fs-5">
+                        <td class="py-0 align-middle fs-5">
                             <div>{highlightSearch(tag).begin}<strong
                                     class="ps-0 d-inline">{highlightSearch(tag).middle}</strong>{highlightSearch(tag).end}
                             </div>
