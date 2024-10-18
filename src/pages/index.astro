@@ -238,8 +238,8 @@ const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => th
                 {
                     all_events.map(event => (
                             <li class="list-group-item d-grid gap-1 p-0 vertical-align-center"
-                                style="grid-template-columns: 0.2fr 1fr">
-                                <div class="p-2 m-0 border-1 border-end border-primary d-grid align-items-center">{event.date.toLocaleDateString()}</div>
+                                style="grid-template-columns: 7rem 1fr">
+                                <div class="p-2 m-0 border-1 border-end border-primary d-grid align-items-center justify-items-center">{event.date.toLocaleDateString()}</div>
                                 <p class="p-2 m-0">
                                     {event.itemType === "UE" ?
                                         (
