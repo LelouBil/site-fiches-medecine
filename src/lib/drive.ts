@@ -35,7 +35,7 @@ const folder_mime_type = "application/vnd.google-apps.folder";
 export async function files_in_folder(folder_id: string, filter_type: FilterType) {
     let res = await drive.files.list({
         q: `'${folder_id}' in parents and trashed = false`,
-        fields: 'files(id, name,webContentLink, fileExtension, mimeType)',
+        fields: 'files(id, name,webContentLink, fileExtension, mimeType, createdTime, modifiedTime)',
     });
     const predicate: ((file: drive_v3.Schema$File) => boolean) =
         filter_type == FilterType.All ? () => true
