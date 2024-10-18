@@ -54,6 +54,8 @@ jobs:
     steps:
       - name: Audit URLs using Lighthouse
         uses: treosh/lighthouse-ci-action@v12
+        env:
+          LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
         with:
           urls: |
             ${{ needs.deploy.outputs.url }}
