@@ -1,0 +1,65 @@
+name: Build Develop Site
+
+on:
+  # Trigger the workflow every time you push to the `main` branch
+  # Using a different branch name? Replace `main` with your branch’s name
+  push:
+    branches: [ develop ]
+  # Allows you to run this workflow manually from the Actions tab on GitHub.
+  workflow_dispatch:
+
+# Allow this job to clone the repo and create a page deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v4
+      - name: Build locally
+        env:
+          DRIVE_OAUTH2_CLIENT_ID: ${{ secrets.DRIVE_OAUTH2_CLIENT_ID }}
+          DRIVE_OAUTH2_CLIENT_SECRET: ${{ secrets.DRIVE_OAUTH2_CLIENT_SECRET }}
+          DRIVE_OAUTH2_REFRESH_TOKEN: ${{ secrets.DRIVE_OAUTH2_REFRESH_TOKEN }}
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+          ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+          ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+          ALGOLIA_SEARCH_KEY: ${{ secrets.ALGOLIA_SEARCH_KEY }}
+        uses: withastro/action@v3
+
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: netlify-develop
+      url: "https://medhisouk-dev.netlify.app/"
+    steps:
+      - name: Waiting for 200 from Netlify
+        uses: probablyup/wait-for-netlify-action@3.2.0
+        id: waitForNetlifyDeploy
+        with:
+          site_id: 'c512ce6f-f147-431f-87d5-8b8153fa3e0e' # See Settings > Site Details > General in the Netlify UI
+        env:
+          NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+  test:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit URLs using Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            ${{ steps.netlify.outputs.url }}
+            ${{ steps.netlify.outputs.url }}/qcms
+            ${{ steps.netlify.outputs.url }}/ues
+            ${{ steps.netlify.outputs.url }}/ues/nutrition
+            ${{ steps.netlify.outputs.url }}/ues/nutrition/aspects-physiologiques-et-biochimiques
+            ${{ steps.netlify.outputs.url }}/ues/nutrition/aspect-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme
+            ${{ steps.netlify.outputs.url }}/ues/nutrition/aspect-physiologique-et-biochimiques/cours-1-vue-d-ensemble-du-metabolisme#modal-nutrition-cours-1-vue-d-ensemble-du-metabolisme-pdf
+          uploadArtifacts: true # save results as an action artifacts
+          temporaryPublicStorage: true # upload lighthouse report to the temporary storage
