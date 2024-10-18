@@ -117,7 +117,7 @@ const all_events = arborescence_cours.flatMap(ue => {
             )
         })
     )
-}).sort((a, b) => a.date.getTime() - b.date.getTime()).toReversed().slice(-30)
+}).sort((a, b) => a.date.getTime() - b.date.getTime()).slice(-20).toReversed()
 
 const all_ues = arborescence_cours
 const all_themes = arborescence_cours.flatMap(ue => ue.themes)
@@ -132,7 +132,7 @@ const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => th
         <div class="text-center p-0 m-0 pe-xl-5" style=" grid-area: 1 / 1 / 2 / 2;">
             <div class="mx-md-0">
                 <Image class="mb-2" src={faviconSrc} alt="logo principal"
-                       style="height: 15rem;width: 15rem; object-fit: contain"/>
+                       style="height: 15rem;width: 15rem; object-fit: contain" loading="eager"/>
                 <h5>🎉 Bienvenue sur Medhi Souk ! 🎉</h5>
                 <p>Je suis ravi de vous présenter cette petite plateforme conçue pour vous accompagner tout au long de
                     votre
