@@ -5,17 +5,134 @@ import faviconSrc from "@/layouts/favicon.png"
 import pierreSrc from "@/layouts/pierre.jpg"
 import leloubilSrc from "@/layouts/LelouBil.png"
 import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
+import {all_questions, arborescence_cours} from "../lib/files";
+import type {UE, Theme, Cours, Fiche} from "../lib/files";
+
+enum HistoryEventType {
+    CREATION,
+    MODIFICATION
+}
+type HistoryEventSpecific<T, S> = {
+    type: HistoryEventType,
+    date: Date,
+    item: T,
+    itemType: S
+}
+
+type QuestionEditEvent = {
+    questionCount: number,
+    cours: Cours
+}
+
+type HistoryEvent =
+    HistoryEventSpecific<UE, "UE">
+    | HistoryEventSpecific<Theme, "Theme">
+    | HistoryEventSpecific<Cours, "Cours">
+    | HistoryEventSpecific<Fiche, "Fiche">
+    | HistoryEventSpecific<QuestionEditEvent, "QuestionEditEvent">
+
+const all_events = arborescence_cours.flatMap(ue => {
+    const evts: HistoryEvent[] = []
+    evts.push({type: HistoryEventType.CREATION, date: ue.creation_date, item: ue, itemType: "UE"})
+    // if modification is at least 5 minutes after creation
+    if (ue.creation_date.getTime() - ue.last_modification_date.getTime() > 5 * 60 * 1000) {
+        evts.push({type: HistoryEventType.MODIFICATION, date: ue.last_modification_date, item: ue, itemType: "UE"})
+    }
+    return evts.concat(
+        ue.themes.flatMap(theme => {
+            const evts: HistoryEvent[] = []
+            evts.push({type: HistoryEventType.CREATION, date: theme.creation_date, item: theme, itemType: "Theme"})
+            // if modification is at least 5 minutes after creation
+            if (theme.creation_date.getTime() - theme.last_modification_date.getTime() > 5 * 60 * 1000) {
+                evts.push({
+                    type: HistoryEventType.MODIFICATION,
+                    date: theme.last_modification_date,
+                    item: theme,
+                    itemType: "Theme"
+                })
+            }
+            return evts.concat(
+                theme.cours.flatMap(cours => {
+                    let evts: HistoryEvent[] = []
+                    evts.push({
+                        type: HistoryEventType.CREATION,
+                        date: cours.creation_date,
+                        item: cours,
+                        itemType: "Cours"
+                    })
+                    // if modification is at least 5 minutes after creation
+                    if (cours.creation_date.getTime() - cours.last_modification_date.getTime() > 5 * 60 * 1000) {
+                        evts.push({
+                            type: HistoryEventType.MODIFICATION,
+                            date: cours.last_modification_date,
+                            item: cours,
+                            itemType: "Cours"
+                        })
+                    }
+                    if (cours.fiches.length > 1) {
+                        evts = evts.concat(
+                            cours.fiches.flatMap(fiche => {
+                                const evts: HistoryEvent[] = []
+                                evts.push({
+                                    type: HistoryEventType.CREATION,
+                                    date: fiche.creation_date,
+                                    item: fiche,
+                                    itemType: "Fiche"
+                                })
+                                // if modification is at least 5 minutes after creation
+                                if (
+                                    fiche.creation_date.getTime() - fiche.last_modification_date.getTime() > 5 * 60 * 1000
+                                ) {
+                                    evts.push({
+                                        type: HistoryEventType.MODIFICATION,
+                                        date: fiche.last_modification_date,
+                                        item: fiche,
+                                        itemType: "Fiche"
+                                    })
+                                }
+                                return evts
+                            })
+                        )
+                    }
+                    if (cours.questions_creation_date) {
+                        console.log(cours.last_modification_date)
+                        evts.push({
+                            type: HistoryEventType.CREATION,
+                            date: cours.questions_creation_date,
+                            item: {questionCount: all_questions.filter(q => q.cours_id === cours.id).length, cours},
+                            itemType: "QuestionEditEvent"
+                        })
+                        console.log("difference between creation and last modif", cours.questions_last_modification_date!.getTime() - cours.questions_creation_date.getTime())
+                        if (cours.questions_creation_date.getTime() - cours.questions_last_modification_date!.getTime() > 5 * 60 * 1000) {
+                            evts.push({
+                                type: HistoryEventType.MODIFICATION,
+                                date: cours.questions_last_modification_date!,
+                                item: {questionCount: all_questions.filter(q => q.cours_id === cours.id).length, cours},
+                                itemType: "QuestionEditEvent"
+                            })
+                        }
+                    }
+                    return evts
+                })
+            )
+        })
+    )
+}).sort((a, b) => a.date.getTime() - b.date.getTime()).slice(-20).toReversed()
+
+const all_ues = arborescence_cours
+const all_themes = arborescence_cours.flatMap(ue => ue.themes)
+const all_cours = arborescence_cours.flatMap(ue => ue.themes.flatMap(theme => theme.cours))
 ---
 
 <Layout title="Accueil">
 
-    <div class="d-flex flex-column d-xl-grid flex-row gap-3"
-         style="grid-template-rows: auto 16rem; grid-template-columns: 3fr 1fr">
+    <div class="d-flex flex-column d-xl-grid flex-row gap-3 main-content"
+         style="grid-template-rows: 1fr 16rem; grid-template-columns: 3fr 1fr">
 
-        <div class="text-center p-0 m-0 pe-5" style=" grid-area: 1 / 1 / 2 / 2;">
-            <div class="mx-md-0" style="width: 100%">
+        <div class="text-center p-0 m-0 pe-xl-5" style=" grid-area: 1 / 1 / 2 / 2;">
+            <div class="mx-md-0">
                 <Image class="mb-2" src={faviconSrc} alt="logo principal"
-                       style="height: 15rem;width: 15rem; object-fit: contain"/>
+                       style="height: 15rem;width: 15rem; object-fit: contain" loading="eager"/>
                 <h5>🎉 Bienvenue sur Medhi Souk ! 🎉</h5>
                 <p>Je suis ravi de vous présenter cette petite plateforme conçue pour vous accompagner tout au long de
                     votre
@@ -31,7 +148,7 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
                     visant à
                     vous aider à consolider vos apprentissages. Et entre nous, je tiens à préciser que l'intégralité des
                     cours ne
-                    sera peut-être pas disponible avant chaque contrôle contiarnu (eh oui, je suis tout seul à gérer ça,
+                    sera peut-être pas disponible avant chaque contrôle continu (eh oui, je suis tout seul à gérer ça,
                     et le
                     sommeil
                     reste une priorité 😅).</p>
@@ -47,7 +164,7 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
                     peut-être
                     même
                     quelques <strong>nouvelles fonctionnalités</strong> ! Un <strong>historique des nouveautés</strong>
-                    est disponible juste a coté
+                    est disponible juste à côté
                     pour
                     que vous
                     restiez informés.</p>
@@ -63,19 +180,21 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
                     🙏
                     <strong>Vous êtes les meilleurs !</strong></p>
                 <p>
-                Un grand merci à mes collaborateurs <strong>LelouBil</strong> et <strong>Tyranozomby</strong> pour la
-                programmation.
+                    Un grand merci à mes collaborateurs <strong>LelouBil</strong> et <strong>Tyranozomby</strong> pour
+                    la
+                    programmation.
                 </p>
                 <p><em>Pierre MARTINI</em></p>
 
             </div>
         </div>
         <div class=" d-flex gap-4 flex-wrap flex-row justify-content-center justify-content-md-center align-items-center p-0"
-             style="grid-area: 2 / 1 / 3 / 2; grid-template-rows: 1fr 1fr; max-width: 100vw">
+             style="grid-area: 2 / 1 / 3 / 2; grid-template-rows: 1fr 1fr;">
             <div class="p-0" style="height: 100%">
                 <div class="card m-0 border border-1 border-primary" style="height: 100%">
                     <img class="card-img-top" src={pierreSrc.src}
-                         style="aspect-ratio: 1; width: 14rem; height: 50%; object-fit: cover" alt="Photo de Pierre Martini"/>
+                         style="aspect-ratio: 1; width: 14rem; height: 50%; object-fit: cover"
+                         alt="Photo de Pierre Martini"/>
                     <div class="card-body bg-primary text-bg-primary">
                         <h5 class="card-title"> Pierre Martini</h5>
                         <p><em>Étudiant en DFGSM3</em></p>
@@ -112,8 +231,68 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
         </div>
         <div class="card border border-primary border-2 p-0" style="grid-area: 1 / 2 / 3 / 3;">
             <div class="card-header bg-primary text-bg-primary" style="word-wrap: normal">
-                <h5 class="card-title text-center vertical-align-center mb-0">Derniers ajouts</h5>
+                <h5 class="card-title text-center vertical-align-center mb-0">Derniers changements</h5>
             </div>
+            <ul class="list-group list-group-flush overflow-y-auto"
+                style="--bs-list-group-border-color: var(--bs-primary)">
+                {
+                    all_events.map(event => (
+                            <li class="list-group-item d-grid gap-1 p-0 vertical-align-center"
+                                style="grid-template-columns: 7rem 1fr">
+                                <div class="p-2 m-0 border-1 border-end border-primary d-grid align-items-center justify-items-center">{event.date.toLocaleDateString()}</div>
+                                <p class="p-2 m-0">
+                                    {event.itemType === "UE" ?
+                                        (
+                                                <span>
+                                                    {event.type === HistoryEventType.CREATION ? "Création de l'UE" : "Modification de l'UE"}
+                                                    <strong> <a target="_blank"
+                                                                href={`ues/${event.item.id}`}>{event.item.name}</a></strong>
+                                                </span>
+                                        )
+                                        : event.itemType === "Theme" ?
+                                            (
+                                                    <span>
+                                                    {event.type === HistoryEventType.CREATION ? "Création du thème" : "Modification du thème"}
+                                                        <strong> <a target="_blank"
+                                                                    href={`ues/${all_ues.find(u => u.themes.includes(event.item))!.id}/${event.item.id}`}>{event.item.name}</a></strong>
+                                                </span>
+                                            )
+                                            : event.itemType === "Cours" ?
+                                                (
+                                                        <span>
+                                                    {event.type === HistoryEventType.CREATION ? "Création du cours" : "Modification du cours"}
+                                                            <strong> <a target="_blank"
+                                                                        href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.includes(event.item)))!.id}/${all_themes.find(t => t.cours.includes(event.item))!.id}/${event.item.id}`}>{event.item.name}</a></strong>
+                                                </span>
+                                                )
+                                                : event.itemType === "Fiche" ?
+                                                    (
+                                                            <span>
+                                                    {event.type === HistoryEventType.CREATION ? "Création de la fiche" : "Modification de la fiche"}
+                                                                <strong> <a target="_blank"
+                                                                            href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.find(c => c.fiches.includes(event.item))))!.id}/${all_themes.find(t => t.cours.find(c => c.fiches.includes(event.item)))!.id}/${all_cours.find(c => c.fiches.includes(event.item))!.id}#${event.item.id}`}>{event.item.name}</a></strong>
+                                                </span>
+                                                    )
+                                                    : event.itemType === "QuestionEditEvent" ?
+                                                        (
+                                                                <span>
+                                                    {event.type === HistoryEventType.CREATION ? (
+                                                                    <>Création de <strong>{event.item.questionCount}
+                                                                        questions</strong></>)
+                                                        : (
+                                                                    <><strong>Modification</strong> des questions</>)
+                                                    }
+                                                                    pour le cours <strong> <a target="_blank"
+                                                                                              href={`ues/${all_ues.find(u => u.themes.find(t => t.cours.find(c => c.id === event.item.cours.id)))!.id}/${all_themes.find(t => t.cours.find(c => c.id === event.item.cours.id))!.id}/${event.item.cours.id}`}>{event.item.cours.name}</a></strong>
+                                                </span>
+                                                        )
+                                                        : null
+                                    }
+                                </p>
+                            </li>
+                    ))
+                }
+            </ul>
         </div>
     </div>
 </Layout>
@@ -122,7 +301,15 @@ import tyranozombySrc from "@/layouts/Tyranozomby.jpg"
     strong {
         font-weight: bold;
     }
-    .card .list-group-item {
-        background-color: #0d6efd;
+
+    .main-content {
+        max-height: 60rem;
     }
+
+    @media screen and (max-width: 768px) {
+        .main-content {
+            max-height: unset;
+        }
+    }
+
 </style>

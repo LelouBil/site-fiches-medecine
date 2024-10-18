@@ -68,7 +68,7 @@ export async function buildPagesIndex(data: AllCours) {
     })
 
     const sortedUEs = data.sort(sortString(ue => ue.name))
-    const sortedThemes = sortedUEs.flatMap(ue => ue.themes.sort(sortString(theme => theme.name)))
+    const sortedThemes = sortedUEs.flatMap(ue => ue.themes.sort(sortString(theme => theme.cours.at(-1)?.name ?? "")))
     const sortedCours = sortedThemes.flatMap(theme => theme.cours.sort(sortString(cours => cours.name)))
     const sortedFiches = sortedCours.flatMap(cours => cours.fiches.sort(sortString(fiche => fiche.name)))
 

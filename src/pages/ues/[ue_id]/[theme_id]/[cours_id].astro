@@ -30,12 +30,12 @@ const cours = theme.cours.find(cours => cours.id === cours_id)!;
                 <div class="card-body d-flex flex-column justify-content-center align-content-center align-items-center py-2">
                     <a href={fiche.download_url}
                        class="btn btn-primary btn-mg btn-block my-3 btn-download"><mark class="text-info text-bg-primary">Télécharger</mark> {fiche.name}</a>
-                    <a data-modal-id={`#modal-${fiche.id}`}
+                    <a data-modal-id={`#${fiche.id}`}
                        class="btn btn-outline-primary d-inline-block mx-auto">
                         Afficher l'aperçu du PDF
                     </a>
 
-                    <div tabindex="-1" class="modal fade" id={`modal-${fiche.id}`}>
+                    <div tabindex="-1" class="modal fade" id={`${fiche.id}`}>
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content p-0 m-0 pdf-modal  border border-primary border-5">
                                 <div class="modal-body p-0 m-0 w-100 h-100">

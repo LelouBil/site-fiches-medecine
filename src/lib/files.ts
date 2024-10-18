@@ -11,11 +11,14 @@ export type CoursId = string & {__brand: "CoursID"}
 export type UeId = string & {__brand: "UEID"}
 export type FicheId = string & {__brand: "FicheID"}
 
-type Fiche = {
+export type Fiche = {
     name: string,
     id: FicheId,
     download_url: string
     embed_url: string
+    creation_date: Date,
+    last_modification_date: Date,
+    cours_id: CoursId
 }
 
 export type FullQuestion = {
@@ -25,23 +28,33 @@ export type FullQuestion = {
 } & z.infer<typeof questionSchema>
 
 
-type Cours = {
+export type Cours = {
     name: string,
     id: CoursId,
     fiches: Fiche[],
     questions_qcm: FullQuestion[],
+    theme_id: ThemeId,
+    creation_date: Date,
+    last_modification_date: Date,
+    questions_creation_date: Date | null,
+    questions_last_modification_date: Date | null,
 }
 
-type Themes = {
+export type Theme = {
     name: string,
     id: ThemeId,
+    ue_id: UeId,
     cours: Cours[]
+    creation_date: Date,
+    last_modification_date: Date,
 }
 
-type UE = {
+export type UE = {
     name: string,
     id: UeId,
-    themes: Themes[]
+    themes: Theme[]
+    creation_date: Date,
+    last_modification_date: Date,
 }
 
 export type AllCours = UE[]
@@ -70,7 +83,7 @@ async function get_arborescence_cours(): Promise<AllCours> {
     const ueFolders = await drive.files_in_folder(drive.ROOT_FOLDER_ID, drive.FilterType.Folders);
     if (ueFolders) {
         for (const dossier_ue of ueFolders) {
-            const themes: Themes[] = [];
+            const themes: Theme[] = [];
             const themeFolders = await drive.files_in_folder(dossier_ue.id!, drive.FilterType.Folders);
             let ueId = normalizeName(dossier_ue.name) as UeId;
             console.log(`UE: ${dossier_ue.name} (${ueId})`);
@@ -90,7 +103,10 @@ async function get_arborescence_cours(): Promise<AllCours> {
                                     id: normalizeName(fiche.name) as FicheId,
                                     name: fiche.name,
                                     download_url: fiche.webContentLink,
-                                    embed_url: `https://drive.google.com/file/d/${fiche.id}/preview`
+                                    embed_url: `https://drive.google.com/file/d/${fiche.id}/preview`,
+                                    creation_date: new Date(fiche.createdTime!),
+                                    last_modification_date: new Date(fiche.modifiedTime!),
+                                    cours_id: coursId
                                 }));
                             for (const fiche of fiches) {
                                 console.log(`Fiche: ${fiche.name} (${fiche.id}) ${fiche.download_url}`)
@@ -127,7 +143,12 @@ async function get_arborescence_cours(): Promise<AllCours> {
                                     name: dossier_cours.name,
                                     id: coursId,
                                     fiches: fiches,
-                                    questions_qcm: questions
+                                    questions_qcm: questions,
+                                    creation_date: new Date(dossier_cours.createdTime!),
+                                    last_modification_date: new Date(dossier_cours.modifiedTime!),
+                                    questions_creation_date: questions_qcm ? new Date(questions_qcm.createdTime!) : null,
+                                    questions_last_modification_date: questions_qcm ? new Date(questions_qcm.modifiedTime!) : null,
+                                    theme_id: themeId,
                                 });
                             }
                         }
@@ -139,7 +160,10 @@ async function get_arborescence_cours(): Promise<AllCours> {
                         themes.push({
                             name: dossier_theme.name,
                             id: themeId,
-                            cours: cours
+                            cours: cours,
+                            creation_date: new Date(dossier_theme.createdTime!),
+                            last_modification_date: new Date(dossier_theme.modifiedTime!),
+                            ue_id: ueId
                         });
                     }
                 }
@@ -147,12 +171,14 @@ async function get_arborescence_cours(): Promise<AllCours> {
             else{
                 console.log("No theme found")
             }
-            themes.sort(sortString(theme => theme.name));
+            themes.sort(sortString(theme => theme.cours.at(-1)?.name || ""));
             if(themes.length > 0) {
                 ues.push({
                     name: dossier_ue.name,
                     id: ueId,
-                    themes: themes
+                    themes: themes,
+                    creation_date: new Date(dossier_ue.createdTime!),
+                    last_modification_date: new Date(dossier_ue.modifiedTime!),
                 });
             }
         }
