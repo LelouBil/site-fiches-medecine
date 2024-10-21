@@ -9,6 +9,7 @@ import AlgoliaSearch from "../components/AlgoliaSearch.astro"
 import logoSrc from './logo.png'
 import githubIcon from './github-mark.svg'
 // import {ViewTransitions} from "astro:transitions"
+import {GOOGLE_ANALYTICS_MEASUREMENT_ID} from "astro:env/client";
 
 interface Props {
     title: string;
@@ -69,6 +70,7 @@ if (path.length >= 1) {
 }
 const navBarId = "navbarTogglerTarget";
 
+
 ---
 
 <!doctype html>
@@ -80,22 +82,30 @@ const navBarId = "navbarTogglerTarget";
     <link rel="icon" type="image/png" href={faviconSrc.src}/>
     <meta name="generator" content={Astro.generator}/>
     <base href={Astro.url.pathname + (Astro.url.pathname === '/' ? '' : '/')}/>
+    <!-- Google tag (gtag.js) -->
+    <script is:inline type="text/partytown" async src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_MEASUREMENT_ID}`}></script>
+    <script is:inline type="text/partytown" data-google-analytics-id={GOOGLE_ANALYTICS_MEASUREMENT_ID} id="analytics">
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', document.getElementById("analytics").getAttribute("data-google-analytics-id"));
+    </script>
+
     <!--<ViewTransitions/>-->
     <title>Medhi Souk | {title}</title>
 </head>
-<body class="d-flex flex-column g-0 ">
+<body class="d-flex flex-column g-0">
 <header class="pt-0 px-0">
     <Navbar class="navbar navbar-expand-lg bg-primary px-3 pt-3 pb-4 mx-0 flex-column flex-md-row" data-bs-theme="dark">
-
         <button
                 class="navbar-toggler m-0 mb-3 align-self-start"
                 type="button"
                 data-bs-toggle="collapse"
-                data-bs-target=`#${navBarId}`
+                data-bs-target={`#${navBarId}`}
                 aria-controls={navBarId}
                 aria-expanded="false"
-                aria-label="Toggle navigation"
-        >
+                aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 

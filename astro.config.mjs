@@ -5,6 +5,10 @@ import svelte from "@astrojs/svelte";
 
 import icon from "astro-icon";
 
+import sitemap from "@astrojs/sitemap";
+
+import partytown from "@astrojs/partytown";
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://medhisouk.fr",
@@ -22,6 +26,7 @@ export default defineConfig({
               DRIVE_OAUTH2_CLIENT_SECRET: envField.string({context: "server", access: "secret"}),
               DRIVE_OAUTH2_REFRESH_TOKEN: envField.string({context: "server", access: "secret"}),
               DRIVE_FOLDER_ID: envField.string({context: "server", access: "secret"}),
+              GOOGLE_ANALYTICS_MEASUREMENT_ID: envField.string({context: "client", access: "public"}),
               ALGOLIA_APP_ID: envField.string({context: "client", access: "public"}),
               ALGOLIA_API_KEY: envField.string({context: "server", access: "secret"}),
               ALGOLIA_SEARCH_KEY: envField.string({context: "client", access: "public"}),
@@ -31,5 +36,11 @@ export default defineConfig({
       }
   },
 
-  integrations: [svelte(), icon()]
+  integrations: [svelte(), icon(), sitemap(), partytown(
+     {
+          config: {
+              forward: ["dataLayer.push"],
+          },
+      }
+  )]
 });
