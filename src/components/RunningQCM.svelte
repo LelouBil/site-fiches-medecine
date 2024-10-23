@@ -236,7 +236,7 @@
         if (((isText && e.ctrlKey) || !isText) && e.key === "Enter" && current_question < questions.length - 1) {
             nextQuestion()
         }
-        if (e.key === "Backspace" && current_question > 0) {
+        if (((isText && e.ctrlKey) || !isText) && e.key === "Backspace" && current_question > 0) {
             previousQuestion()
         }
 
